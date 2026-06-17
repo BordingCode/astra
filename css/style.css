@@ -160,6 +160,25 @@ input[type=checkbox]:checked::after{transform:translateX(19px);}
   background:rgba(110,228,255,.10);border:1px solid rgba(110,228,255,.28);color:var(--cyan);}
 .quiz-why.ok{background:rgba(75,224,138,.10);border-color:rgba(75,224,138,.3);color:#bfffd6;}
 
+/* ---------- finale (journey complete) ---------- */
+#finale{background:radial-gradient(125% 95% at 50% 38%,rgba(40,24,70,.42),rgba(5,6,14,.93));}
+.finale-inner{text-align:center;max-width:400px;max-height:88svh;overflow:auto;padding:22px;}
+.finale-spark{font-size:42px;color:#fff;text-shadow:0 0 26px rgba(255,222,140,.9),0 0 50px rgba(174,160,255,.7);
+  animation:finglow 2.6s ease-in-out infinite;}
+@keyframes finglow{0%,100%{transform:scale(1);opacity:.92}50%{transform:scale(1.12);opacity:1}}
+.finale-inner h1{margin:6px 0 8px;font-size:30px;font-weight:700;letter-spacing:4px;color:#fff;
+  text-shadow:0 0 28px rgba(110,228,255,.6);}
+.finale-lede{font-size:14px;color:var(--cyan);line-height:1.5;margin:0 0 18px;}
+.finale-laws{display:flex;flex-direction:column;gap:8px;text-align:left;margin-bottom:16px;}
+.fin-law{display:flex;gap:11px;align-items:center;padding:10px 12px;border-radius:12px;
+  background:rgba(150,190,255,.06);border:1px solid rgba(150,190,255,.14);
+  opacity:0;transform:translateX(-8px);animation:finrise .5s ease forwards;}
+@keyframes finrise{to{opacity:1;transform:translateX(0)}}
+.fin-law .fin-ico{flex:none;width:30px;height:30px;border-radius:9px;display:grid;place-items:center;font-size:16px;
+  color:#cfe7ff;background:rgba(110,228,255,.12);border:1px solid rgba(110,228,255,.3);text-shadow:0 0 10px rgba(110,228,255,.5);}
+.fin-law span:last-child{font-size:13px;color:var(--ink);line-height:1.4;}
+.finale-stats{font-size:13px;color:var(--gold);font-weight:600;margin:0 0 6px;}
+
 /* ---------- intro ---------- */
 #intro{background:radial-gradient(120% 90% at 50% 30%,rgba(26,35,80,.6),rgba(5,6,14,.96));}
 .intro-inner{text-align:center;max-width:380px;padding:24px;}

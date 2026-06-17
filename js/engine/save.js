@@ -18,6 +18,7 @@ const DEFAULT = {
   feltOrbit: false,              // has the player put something into a stable orbit?
   feltSystem: false,             // has the player built a multi-world system?
   feltLight: false,              // has the player bent/split light? (finale)
+  gameComplete: false,           // has the player finished the whole journey?
   // curiosities found off the main path
   curiosities: [],
   // ui / one-time

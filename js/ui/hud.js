@@ -1,6 +1,6 @@
 // hud.js — all DOM UI for ASTRA: tabs, objectives, toasts, flash, how-it-works,
 // the stage-clear lesson reveal, field notes, intro, menu.
-import { STAGES, HOWTO, LESSON, TRUTH, QUIZ } from '../data/stages.js';
+import { STAGES, HOWTO, LESSON, TRUTH, QUIZ, FINALE_LINES } from '../data/stages.js';
 
 const $ = (id) => document.getElementById(id);
 let G = null;
@@ -10,7 +10,9 @@ export function init(game, h) {
   G = game; hooks = h || {};
   buildTabs(game);
 
-  $('menuBtn').addEventListener('click', () => $('menu').classList.remove('hidden'));
+  $('menuBtn').addEventListener('click', () => { $('journeyBtn').classList.toggle('hidden', !game.state.gameComplete); $('menu').classList.remove('hidden'); });
+  $('journeyBtn').addEventListener('click', () => { $('menu').classList.add('hidden'); showFinale(game); });
+  $('finaleClose').addEventListener('click', () => $('finale').classList.add('hidden'));
   $('codexBtn').addEventListener('click', () => { renderCodex(game); $('codex').classList.remove('hidden'); });
   $('howtoBtn').addEventListener('click', () => openHowto(game.sceneName, true));
   $('objToggle').addEventListener('click', () => {
@@ -200,6 +202,16 @@ export function renderCodex(game) {
       : `<h3>${st.ico} ${st.label}</h3><p class="dim">Locked — clear this stage to record what you learned.</p>`;
     body.appendChild(c);
   });
+}
+
+// ---------------- finale: the journey-complete recap ----------------
+export function showFinale(game) {
+  const body = $('finaleBody');
+  body.innerHTML = STAGES.map((st, i) =>
+    `<div class="fin-law" style="animation-delay:${i * 0.12}s"><span class="fin-ico">${st.ico}</span><span>${FINALE_LINES[st.id] || ''}</span></div>`).join('');
+  const challenges = STAGES.length * 3;
+  $('finaleStats').textContent = `${STAGES.length} laws · ${challenges} challenges · ✦ ${game.state.insight} insight`;
+  $('finale').classList.remove('hidden');
 }
 
 // ---------------- intro ----------------

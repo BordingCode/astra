@@ -112,6 +112,17 @@ export const TRUTH = {
   light: 'A rainbow is sunlight bent and split inside millions of raindrops — and because the angle is fixed, everyone sees their OWN private rainbow, made of light from different drops, meant just for their eyes.',
 };
 
+// One-line essence of each law, for the journey-complete recap.
+export const FINALE_LINES = {
+  drift: 'In empty space, motion just keeps going.',
+  fall:  'Everything falls the same — and never stops speeding up.',
+  throw: 'A throw is two motions at once, tracing a curve.',
+  force: 'a = F ÷ m — and every push pushes back.',
+  orbit: 'An orbit is falling sideways, forever missing the ground.',
+  system: 'Many worlds circle a star; the far ones run slow.',
+  light: 'Light bounces, bends — and hides every colour.',
+};
+
 // A tiny conceptual quick-check after each stage. Every wrong option is a REAL, common
 // misconception (vetted) — answering either way shows a one-line "why". Keep them playful.
 export const QUIZ = {

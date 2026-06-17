@@ -14,7 +14,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="css/style.css?v=3" />
+<link rel="stylesheet" href="css/style.css?v=4" />
 </head>
 <body>
 <div id="stage">
@@ -61,6 +61,7 @@
       <label class="row"><span>Sound</span><input type="checkbox" id="soundToggle" checked /></label>
       <label class="row"><span>Predict before launch<br/><small class="dim">Call the result first — a right guess earns Insight, a wrong one teaches</small></span><input type="checkbox" id="predictToggle" checked /></label>
       <label class="row"><span>Show the maths<br/><small class="dim">A live, colour-coded formula that moves with the action</small></span><input type="checkbox" id="mathToggle" checked /></label>
+      <button class="ghost hidden" id="journeyBtn">✦ Replay your journey</button>
       <button class="danger" id="resetBtn">Reset all progress</button>
       <p class="credit">ASTRA · a journey through the laws of motion<br/>Every simulation is real physics.</p>
     </div>
@@ -95,6 +96,18 @@
     </div>
   </div>
 
+  <!-- journey complete -->
+  <div id="finale" class="overlay hidden">
+    <div class="finale-inner">
+      <div class="finale-spark">✦</div>
+      <h1>Your journey</h1>
+      <p class="finale-lede">From a single speck in the dark to the laws that run the universe.</p>
+      <div id="finaleBody" class="finale-laws"></div>
+      <p id="finaleStats" class="finale-stats"></p>
+      <button class="reveal-btn" id="finaleClose">Wander freely ›</button>
+    </div>
+  </div>
+
   <!-- intro -->
   <div id="intro" class="overlay">
     <div class="intro-inner">
@@ -108,7 +121,7 @@
   </div>
 </div>
 
-<script type="module" src="js/main.js?v=6"></script>
+<script type="module" src="js/main.js?v=7"></script>
 <script>
   // --- resilience layer (plain script, runs even if the game module fails to boot) ---
   (function () {

@@ -98,8 +98,28 @@ const game = {
     const idx = STAGES.findIndex(s => s.id === id);
     const next = STAGES[idx + 1];
     UI.showClear(this, id, () => {
-      UI.showQuiz(this, id, () => { if (next && this.stageUnlocked(next.id)) this.go(next.id); });
+      UI.showQuiz(this, id, () => {
+        if (next && this.stageUnlocked(next.id)) this.go(next.id);
+        else if (!next) this.runFinale();          // the last stage → the journey is complete
+      });
     });
+  },
+
+  // The whole journey is done: erupt the cosmos into colour, then show the recap.
+  runFinale() {
+    this.state.gameComplete = true; this.persist();
+    gl.setNebula({ colA: [0.45, 0.25, 0.55], colB: [0.95, 0.70, 0.35], intensity: 1.7, focus: [0.5, 0.5] });
+    const cols = [[1, 0.35, 0.35], [1, 0.6, 0.25], [1, 0.9, 0.35], [0.4, 1, 0.55], [0.4, 0.7, 1], [0.7, 0.45, 1]];
+    let k = 0;
+    const fire = () => {
+      const x = this.W * (0.18 + Math.random() * 0.64), y = this.H * (0.18 + Math.random() * 0.5);
+      gl.burst(x, y, 44, { color: cols[k % cols.length], speed: 220, size: 26, life: 1.5, alpha: 0.95 });
+      if (++k < 9) setTimeout(fire, 150);
+    };
+    fire();
+    sfx.win();
+    UI.flash('You did it — light fills the world.');
+    setTimeout(() => UI.showFinale(this), 1700);
   },
 
   refreshGoals() { UI.refreshGoals(this); },
