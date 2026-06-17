@@ -6,6 +6,7 @@ import * as Save from './engine/save.js';
 import { unlock as audioUnlock, sfx, setEnabled as setAudioEnabled } from './engine/audio.js';
 import { STAGES, NEBULA, LESSON } from './data/stages.js';
 import * as UI from './ui/hud.js';
+import { drawEquation } from './render/equation.js';
 import { DriftScene } from './scenes/drift.js';
 import { FallScene } from './scenes/fall.js';
 import { ThrowScene } from './scenes/throw.js';
@@ -89,10 +90,12 @@ const game = {
     this.persist();
     this.checkGates();
     sfx.win();
-    // show the lesson + the true fact, then auto-advance to the next stage if there is one
+    // show the lesson + true fact → a quick conceptual quiz → then advance to the next stage
     const idx = STAGES.findIndex(s => s.id === id);
     const next = STAGES[idx + 1];
-    UI.showClear(this, id, () => { if (next && this.stageUnlocked(next.id)) this.go(next.id); });
+    UI.showClear(this, id, () => {
+      UI.showQuiz(this, id, () => { if (next && this.stageUnlocked(next.id)) this.go(next.id); });
+    });
   },
 
   refreshGoals() { UI.refreshGoals(this); },
@@ -124,6 +127,11 @@ const loop = createLoop({
     gl.render(game.time);
     ctx.clearRect(0, 0, game.W, game.H);
     if (game.scene && game.scene.render) game.scene.render(ctx, game);
+    // the live, colour-coded formula layer — each scene describes its current equation
+    if (game.state.showMath && game.scene && game.scene.mathLayer) {
+      const m = game.scene.mathLayer(game);
+      if (m && m.cells) drawEquation(ctx, m.x, m.y, m.cells, { size: m.size || 24 });
+    }
     input.endFrame();
   },
 });

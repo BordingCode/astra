@@ -179,6 +179,19 @@ export class FallScene {
     ctx.fillText(c.label, c.x + c.w / 2, c.y + c.h / 2); ctx.restore();
   }
 
+  // live formula: v = g · t  (the falling speed grows because t grows; g is fixed)
+  mathLayer(game) {
+    if (this.phase !== 'drop' && this.phase !== 'land') return null;
+    const t = this.dropT, v = G * t, e = Math.min(1, t / this.tLand) * 0.7;
+    return { x: game.W / 2, y: game.H * 0.25, size: 23, cells: [
+      { sym: 'v', val: v.toFixed(0), unit: 'm/s', color: '#6be4ff', emph: e },
+      { op: '=' },
+      { sym: 'g', val: '9.8', color: '#ffd66b' },
+      { op: '·' },
+      { sym: 't', val: t.toFixed(1), unit: 's', color: '#ffffff', emph: e },
+    ] };
+  }
+
   objectives(game) {
     const n = this.challenges.length;
     return {

@@ -154,6 +154,15 @@ export class DriftScene {
     if (this.phase === 'fly' && this.type === 'nudge' && this.nudgesLeft > 0) label(ctx, game.W / 2, game.H * 0.88, 'tap to nudge — bend toward the second gate', { color: '#fff', size: 13 });
   }
 
+  // live formula: v = constant (the speed doesn't change without a force — Newton 1)
+  mathLayer(game) {
+    if (this.phase !== 'fly' && this.phase !== 'clear') return null;
+    const sp = Math.hypot(this.mote.vx, this.mote.vy);
+    return { x: game.W / 2, y: game.H * 0.25, size: 22, cells: [
+      { sym: 'v', val: sp.toFixed(0), color: '#6be4ff' }, { op: '=' }, { txt: 'constant', color: '#ffffff' },
+    ] };
+  }
+
   objectives(game) {
     const n = this.challenges.length, passed = this.gates ? this.gates.filter(g => g.passed).length : 0, total = this.gates ? this.gates.length : 0;
     return {

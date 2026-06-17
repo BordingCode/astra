@@ -213,6 +213,19 @@ export class ThrowScene {
     ctx.fillText(c.label, c.x + c.w / 2, c.y + c.h / 2); ctx.restore();
   }
 
+  // live formula: the two independent speeds — vₓ steady, v_y passing through 0 at the top
+  mathLayer(game) {
+    if (this.type === 'dropfire' || this.phase !== 'fly' || !this.shot) return null;
+    const vx = this.shot.proj.vx;
+    const vy = this.shot.proj.vel(this.flyT).y;     // +up; 0 at the peak
+    const eTop = Math.max(0, 1 - Math.abs(vy) / 5) * 0.9;
+    return { x: game.W / 2, y: game.H * 0.25, size: 22, cells: [
+      { sym: 'v', sub: 'x', val: vx.toFixed(0), unit: 'm/s', color: '#7fe0a0' },
+      { txt: '   ' },
+      { sym: 'v', sub: 'y', val: vy.toFixed(0), unit: 'm/s', color: '#aef0ff', emph: eTop },
+    ] };
+  }
+
   objectives(game) {
     const n = this.challenges.length;
     return {

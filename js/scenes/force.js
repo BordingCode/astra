@@ -200,8 +200,13 @@ export class ForceScene {
     }
     drawMote(ctx, xH, this.laneH, 17, HEAVY, { time: t, pulse: this.phase === 'predict' ? 1 : 0 });
     drawMote(ctx, xL, this.laneL, 10, LIGHT, { time: t, pulse: this.phase === 'predict' ? 1 : 0 });
-    label(ctx, xH, this.laneH - 30, 'heavy', { color: hexA(HEAVY, 0.85), size: 12 });
-    label(ctx, xL, this.laneL - 24, 'light', { color: hexA(LIGHT, 0.85), size: 12 });
+    label(ctx, xH, this.laneH - 30, 'heavy · m = 3', { color: hexA(HEAVY, 0.85), size: 12 });
+    label(ctx, xL, this.laneL - 24, 'light · m = 1', { color: hexA(LIGHT, 0.85), size: 12 });
+    // each mote's live acceleration: same push F, but a = F/m → light accelerates more
+    if (game.state.showMath && this.phase !== 'predict') {
+      label(ctx, xH, this.laneH + 32, `a = ${aH.toFixed(1)} m/s²`, { color: hexA(HEAVY, 0.95), size: 12.5 });
+      label(ctx, xL, this.laneL + 28, `a = ${aL.toFixed(1)} m/s²`, { color: hexA(LIGHT, 0.95), size: 12.5 });
+    }
 
     if (this.phase === 'predict') {
       label(ctx, game.W / 2, this.chips[0].y - 22, game.state.predictMode ? 'Same push on both — who reaches the line first?' : 'Give both the same push', { size: 14.5, color: '#fff' });
@@ -264,6 +269,15 @@ export class ForceScene {
     ctx.fillStyle = '#ffe8da'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     ctx.font = '700 16px "Outfit", system-ui, sans-serif';
     ctx.fillText(b.label, b.x + b.w / 2, b.y + b.h / 2); ctx.restore();
+  }
+
+  // live formula: a = F ÷ m  (same push F on both; bigger m → smaller a)
+  mathLayer(game) {
+    if (this.type !== 'race' || this.phase === 'predict') return null;
+    return { x: game.W / 2, y: game.H * 0.70, size: 24, cells: [
+      { sym: 'a', color: '#aef0ff' }, { op: '=' },
+      { frac: { num: [{ sym: 'F', val: '8', unit: 'N', color: '#ff9a6b' }], den: [{ sym: 'm', unit: 'kg', color: '#ffffff' }] }, color: '#cfe0ff' },
+    ] };
   }
 
   objectives(game) {

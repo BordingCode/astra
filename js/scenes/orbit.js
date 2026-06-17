@@ -255,6 +255,21 @@ export class OrbitScene {
     ctx.stroke(); ctx.restore();
   }
 
+  // live formula: circular-orbit speed, and the escape relation in the escape challenge
+  mathLayer(game) {
+    if (this.phase === 'done') return null;
+    if (this.type === 'escape') {
+      return { x: game.W / 2, y: game.H * 0.88, size: 21, cells: [
+        { sym: 'v', sub: 'esc', color: '#ffd66b' }, { op: '=' }, { txt: '√2', color: '#ffffff' }, { op: '·' },
+        { sym: 'v', sub: 'c', color: '#aef0ff' }, { op: '≈' }, { txt: '1.41×', color: '#ffd66b' },
+      ] };
+    }
+    return { x: game.W / 2, y: game.H * 0.88, size: 21, cells: [
+      { sym: 'v', sub: 'c', color: '#aef0ff' }, { op: '=' },
+      { sqrt: [{ frac: { num: [{ sym: 'G' }, { sym: 'M' }], den: [{ sym: 'r' }] }, color: '#cfe0ff' }] },
+    ] };
+  }
+
   objectives(game) {
     const n = this.challenges.length;
     return {

@@ -1,6 +1,6 @@
 // hud.js — all DOM UI for ASTRA: tabs, objectives, toasts, flash, how-it-works,
 // the stage-clear lesson reveal, field notes, intro, menu.
-import { STAGES, HOWTO, LESSON, TRUTH } from '../data/stages.js';
+import { STAGES, HOWTO, LESSON, TRUTH, QUIZ } from '../data/stages.js';
 
 const $ = (id) => document.getElementById(id);
 let G = null;
@@ -31,6 +31,10 @@ export function init(game, h) {
   const pred = $('predictToggle');
   pred.checked = game.state.predictMode;
   pred.addEventListener('change', () => { game.state.predictMode = pred.checked; game.persist(); });
+
+  const math = $('mathToggle');
+  math.checked = game.state.showMath;
+  math.addEventListener('change', () => { game.state.showMath = math.checked; game.persist(); });
 
   $('resetBtn').addEventListener('click', () => { if (confirm('Reset all progress?')) hooks.resetSave && hooks.resetSave(); });
 
@@ -138,6 +142,50 @@ export function showClear(game, stageId, onNext) {
   const ov = $('clear'); ov.classList.remove('hidden');
   const btn = $('clearNext');
   btn.onclick = () => { ov.classList.add('hidden'); onNext && onNext(); };
+}
+
+// ---------------- quick-check quiz (between stages) ----------------
+// A tiny conceptual check after a stage. Distractors are real misconceptions; answering
+// either way shows a one-line "why". Calls onDone() when finished (or immediately if no quiz).
+export function showQuiz(game, stageId, onDone) {
+  const qs = QUIZ[stageId];
+  if (!qs || !qs.length) { onDone && onDone(); return; }
+  const ov = $('quiz'); let i = 0;
+
+  function renderQ() {
+    const item = qs[i];
+    $('quizHead').textContent = qs.length > 1 ? 'Quick check' : 'One quick check';
+    $('quizProg').textContent = qs.length > 1 ? `${i + 1} / ${qs.length}` : '';
+    $('quizQ').textContent = item.q;
+    const why = $('quizWhy'); why.classList.add('hidden'); why.classList.remove('ok');
+    const next = $('quizNext'); next.classList.add('hidden');
+    const box = $('quizOpts'); box.innerHTML = '';
+    item.options.forEach((opt) => {
+      const b = document.createElement('button');
+      b.className = 'quiz-opt'; b.textContent = opt.t;
+      b.addEventListener('click', () => answer(item, opt, box, why, next), { once: true });
+      box.appendChild(b);
+    });
+    ov.classList.remove('hidden');
+  }
+  function answer(item, opt, box, why, next) {
+    const correctOpt = item.options.find(o => o.correct);
+    [...box.children].forEach((b, idx) => {
+      b.disabled = true;
+      const o = item.options[idx];
+      if (o.correct) b.classList.add('correct');
+      else if (o === opt) b.classList.add('wrong');
+      else b.classList.add('dim');
+    });
+    if (opt.correct) { game.award(4); game.sfx.tick(); } else game.sfx.reject();
+    why.innerHTML = (opt.correct ? '✓ ' : '') + (opt.why || (correctOpt && correctOpt.why) || item.explain || '');
+    why.classList.toggle('ok', !!opt.correct);
+    why.classList.remove('hidden');
+    next.textContent = i < qs.length - 1 ? 'Next ›' : 'Onward ›';
+    next.classList.remove('hidden');
+    next.onclick = () => { i++; if (i < qs.length) renderQ(); else { ov.classList.add('hidden'); onDone && onDone(); } };
+  }
+  renderQ();
 }
 
 // ---------------- field notes ----------------
