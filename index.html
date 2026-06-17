@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+<meta name="theme-color" content="#05060e" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<title>ASTRA — learn the laws of motion by playing with them</title>
+<link rel="icon" href="assets/icon.svg" type="image/svg+xml" />
+<link rel="apple-touch-icon" href="assets/icon.svg" />
+<link rel="manifest" href="manifest.json" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="css/style.css?v=1" />
+</head>
+<body>
+<div id="stage">
+  <canvas id="gl"></canvas>
+  <canvas id="fx"></canvas>
+
+  <!-- top bar -->
+  <header id="hud">
+    <div class="brand">ASTRA<span class="scene-title" id="sceneTitle"></span></div>
+    <div class="hud-right">
+      <button class="insight" id="insightBtn" title="Insight — earned by good predictions">✦ <span id="insightVal">0</span></button>
+      <button class="iconbtn" id="codexBtn" title="Field notes">☷</button>
+      <button class="iconbtn" id="menuBtn" title="Menu">⋯</button>
+    </div>
+  </header>
+
+  <!-- objectives -->
+  <aside id="objectives" class="panel">
+    <div class="obj-head"><span id="objTitle">Objective</span>
+      <button class="mini" id="howtoBtn" title="How this stage works">?</button>
+      <button class="mini" id="objToggle">–</button></div>
+    <div id="objList"></div>
+  </aside>
+
+  <!-- bottom scene nav (built from STAGES) -->
+  <nav id="tabs"></nav>
+
+  <!-- toasts -->
+  <div id="toasts"></div>
+
+  <!-- field notes overlay -->
+  <div id="codex" class="overlay hidden">
+    <div class="sheet">
+      <div class="sheet-head"><h2>Field notes</h2><button class="close" data-close>✕</button></div>
+      <p class="lede-sm">What you’ve worked out, one law at a time.</p>
+      <div id="codexBody"></div>
+    </div>
+  </div>
+
+  <!-- menu overlay -->
+  <div id="menu" class="overlay hidden">
+    <div class="sheet small">
+      <div class="sheet-head"><h2>Menu</h2><button class="close" data-close>✕</button></div>
+      <label class="row"><span>Sound</span><input type="checkbox" id="soundToggle" checked /></label>
+      <label class="row"><span>Predict before launch<br/><small class="dim">Call the result first — a right guess earns Insight, a wrong one teaches</small></span><input type="checkbox" id="predictToggle" checked /></label>
+      <button class="danger" id="resetBtn">Reset all progress</button>
+      <p class="credit">ASTRA · a journey through the laws of motion<br/>Every simulation is real physics.</p>
+    </div>
+  </div>
+
+  <!-- how-it-works modal -->
+  <div id="howto" class="overlay hidden">
+    <div class="sheet">
+      <div class="sheet-head"><h2 id="howtoTitle">How it works</h2><button class="close" data-close>✕</button></div>
+      <div id="howtoBody"></div>
+      <button class="reveal-btn howto-ok" id="howtoOk">Got it</button>
+    </div>
+  </div>
+
+  <!-- stage-clear: the lesson + the true fact -->
+  <div id="clear" class="overlay hidden">
+    <div class="sheet small">
+      <div class="sheet-head"><h2 id="clearTitle">You felt it.</h2></div>
+      <div id="clearBody"></div>
+      <button class="reveal-btn" id="clearNext">Next ›</button>
+    </div>
+  </div>
+
+  <!-- intro -->
+  <div id="intro" class="overlay">
+    <div class="intro-inner">
+      <div class="intro-atom">⟶</div>
+      <h1>ASTRA</h1>
+      <p class="lede">A single speck of matter, adrift in the dark.</p>
+      <p class="sub">Learn how things move — drift, fall, and fly — by predicting them and
+        watching the real laws prove you right or wrong. One true step at a time.</p>
+      <button id="beginBtn">Begin</button>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="js/main.js?v=1"></script>
+<script>
+  // --- resilience layer (plain script, runs even if the game module fails to boot) ---
+  (function () {
+    var b = document.getElementById('beginBtn');
+    function dismissIntro() { var i = document.getElementById('intro'); if (i) i.classList.add('hidden'); }
+    if (b) { b.addEventListener('click', dismissIntro); b.addEventListener('touchend', dismissIntro); }
+
+    // Self-heal: if a stale cached version stops the game booting, wipe SW + caches once and reload.
+    async function heal() {
+      try {
+        if ('serviceWorker' in navigator) {
+          var regs = await navigator.serviceWorker.getRegistrations();
+          for (var i = 0; i < regs.length; i++) await regs[i].unregister();
+        }
+        if (window.caches) { var ks = await caches.keys(); for (var j = 0; j < ks.length; j++) await caches.delete(ks[j]); }
+      } catch (e) {}
+      location.reload();
+    }
+    window.addEventListener('load', function () {
+      setTimeout(function () {
+        if (window.__astra) return;
+        if (sessionStorage.getItem('astra-healed')) return;
+        sessionStorage.setItem('astra-healed', '1');
+        heal();
+      }, 3500);
+    });
+
+    if ('serviceWorker' in navigator) {
+      if (navigator.serviceWorker.controller) {
+        navigator.serviceWorker.addEventListener('controllerchange', function () {
+          if (window.__swReloaded) return; window.__swReloaded = true; location.reload();
+        });
+      }
+      window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); });
+    }
+  })();
+</script>
+</body>
+</html>

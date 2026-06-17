@@ -1,0 +1,14 @@
+{
+  "name": "ASTRA — laws of motion",
+  "short_name": "ASTRA",
+  "description": "Learn the fundamentals of physics by predicting motion and watching the real laws play out.",
+  "start_url": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#05060e",
+  "theme_color": "#05060e",
+  "icons": [
+    { "src": "assets/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "assets/icon-maskable.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+  ]
+}
