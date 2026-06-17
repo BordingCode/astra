@@ -10,6 +10,7 @@ import { DriftScene } from './scenes/drift.js';
 import { FallScene } from './scenes/fall.js';
 import { ThrowScene } from './scenes/throw.js';
 import { ForceScene } from './scenes/force.js';
+import { OrbitScene } from './scenes/orbit.js';
 
 const glCanvas = document.getElementById('gl');
 const fxCanvas = document.getElementById('fx');
@@ -66,6 +67,7 @@ const game = {
     if (id === 'fall') return !!this.state.stagesDone.drift;
     if (id === 'throw') return !!this.state.stagesDone.fall;
     if (id === 'force') return !!this.state.stagesDone.throw;
+    if (id === 'orbit') return !!this.state.stagesDone.force;
     return false;
   },
   checkGates() { UI.refreshGates(this); },
@@ -131,6 +133,7 @@ function boot() {
   game.scenes.fall = new FallScene();
   game.scenes.throw = new ThrowScene();
   game.scenes.force = new ForceScene();
+  game.scenes.orbit = new OrbitScene();
   UI.init(game, { setAudioEnabled, resetSave: () => { Save.resetSave(); location.reload(); } });
   resize();
   game.checkGates();

@@ -15,6 +15,7 @@ const DEFAULT = {
   feltFall: false,               // has the player SEEN acceleration in FALL? (gates ORBIT later)
   feltDrift: false,              // has the player seen frictionless constant motion?
   feltForce: false,              // has the player felt a steady push become acceleration?
+  feltOrbit: false,              // has the player put something into a stable orbit?
   // curiosities found off the main path
   curiosities: [],
   // ui / one-time
