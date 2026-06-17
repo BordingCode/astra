@@ -93,6 +93,7 @@ const game = {
     if (firstTime) this.award(20);
     this.persist();
     this.checkGates();
+    UI.syncReview(this); UI.updateReviewPrompt(this);   // seed this stage's concepts into spaced review
     sfx.win();
     // show the lesson + true fact → a quick conceptual quiz → then advance to the next stage
     const idx = STAGES.findIndex(s => s.id === id);
@@ -174,6 +175,7 @@ function boot() {
   const saved = game.state.scene;
   game._activate(saved && game.scenes[saved] && game.stageUnlocked(saved) ? saved : 'drift');
   UI.setInsight(game.state.insight);
+  UI.syncReview(game); UI.updateReviewPrompt(game);   // schedule earned concepts; nudge if any are due
   loop.start();
   if (!game.state.introSeen) UI.showIntro(game, () => { game.state.introSeen = true; game.persist(); UI.maybeHowto(game, game.sceneName); });
 }

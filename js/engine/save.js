@@ -26,6 +26,7 @@ const DEFAULT = {
   showMath: true,                // show the live, colour-coded formula layer (toggle in menu)
   reduceMotion: false,           // suppress particle showers / heavy FX (toggle in menu)
   predictedRight: {},            // stageId -> true if the player nailed that stage's key prediction
+  review: {},                    // cardId -> { box, due } spaced-repetition schedule for each concept
   coachSeen: {},                 // one-time coaching toasts already shown
   howtoSeen: {},                 // sceneId -> true once its "how it works" card was shown
   introSeen: false,
