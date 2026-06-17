@@ -12,6 +12,7 @@ import { FallScene } from './scenes/fall.js';
 import { ThrowScene } from './scenes/throw.js';
 import { ForceScene } from './scenes/force.js';
 import { OrbitScene } from './scenes/orbit.js';
+import { SystemScene } from './scenes/system.js';
 
 const glCanvas = document.getElementById('gl');
 const fxCanvas = document.getElementById('fx');
@@ -69,6 +70,7 @@ const game = {
     if (id === 'throw') return !!this.state.stagesDone.fall;
     if (id === 'force') return !!this.state.stagesDone.throw;
     if (id === 'orbit') return !!this.state.stagesDone.force;
+    if (id === 'system') return !!this.state.stagesDone.orbit;
     return false;
   },
   checkGates() { UI.refreshGates(this); },
@@ -142,6 +144,7 @@ function boot() {
   game.scenes.throw = new ThrowScene();
   game.scenes.force = new ForceScene();
   game.scenes.orbit = new OrbitScene();
+  game.scenes.system = new SystemScene();
   UI.init(game, { setAudioEnabled, resetSave: () => { Save.resetSave(); location.reload(); } });
   resize();
   game.checkGates();

@@ -8,6 +8,7 @@ export const STAGES = [
   { id: 'throw', ico: '↗', label: 'Throw' },
   { id: 'force', ico: '⇉', label: 'Force' },
   { id: 'orbit', ico: '⊙', label: 'Orbit' },
+  { id: 'system', ico: '✲', label: 'System' },
 ];
 
 // per-stage cosmos colours (nebula colA/colB in 0..1) — the world's mood shifts as you go
@@ -17,6 +18,7 @@ export const NEBULA = {
   throw: { colA: [0.12, 0.18, 0.34], colB: [0.30, 0.45, 0.40], focus: [0.5, 0.75] },
   force: { colA: [0.26, 0.14, 0.20], colB: [0.55, 0.32, 0.22], focus: [0.5, 0.5] },
   orbit: { colA: [0.10, 0.11, 0.30], colB: [0.28, 0.20, 0.52], focus: [0.5, 0.52] },
+  system: { colA: [0.12, 0.10, 0.26], colB: [0.34, 0.26, 0.48], focus: [0.5, 0.5] },
 };
 
 // "How it works" cards — shown once per stage, dismissible. Short.
@@ -66,6 +68,15 @@ export const HOWTO = {
     ],
     tip: 'An orbit is a throw that never lands — you keep falling, but the ground curves away as fast as you drop.',
   },
+  system: {
+    title: 'System — a family of worlds',
+    body: [
+      'One star, many worlds — each falling around it at its own distance.',
+      'Add a new world to the system, then see who runs the faster year.',
+      'And a moving world’s gravity can fling a passing probe faster — for free.',
+    ],
+    tip: 'The farther out a world orbits, the slower it moves and the longer its year.',
+  },
 };
 
 // The single transferable idea per stage (used in the "you understand" beat + codex).
@@ -75,6 +86,7 @@ export const LESSON = {
   throw: 'A throw is two independent motions at once — steady sideways, accelerating down — which trace a parabola.',
   force: 'A force doesn’t set a speed — it changes one: a = F ÷ m. The same push moves a heavy mass less, and held steady it speeds things up without end. Every push also pushes back.',
   orbit: 'An orbit is just falling sideways fast enough to keep missing the ground. Gravity never lets go — the Moon, the Space Station, everything in orbit is in endless free-fall. Go faster than escape speed (only √2× the circular speed) and you never come back.',
+  system: 'A solar system is many orbits at once — each world falling around the star at its own distance. The farther out, the slower it moves and the longer its year (Kepler’s 3rd law). And a moving world’s gravity can fling a passing probe faster, for free — a slingshot.',
 };
 
 // "Whoa, and it's TRUE" facts surfaced at the right moment.
@@ -84,6 +96,7 @@ export const TRUTH = {
   throw: 'Drop a ball and fire one sideways at the same instant from the same height — they land together.',
   force: 'A rocket has nothing to push against in space. It hurls gas out the back, and that hurls it forward — every push pushes back (Newton’s 3rd law).',
   orbit: 'Astronauts aren’t beyond gravity — at the Space Station’s height it’s still about 90% as strong. They float because they’re falling around the Earth, endlessly missing it.',
+  system: 'Voyager 2 slingshot past Jupiter, Saturn, Uranus and Neptune in turn — borrowing a sliver of each planet’s motion to fling itself onward. It’s still flying, over 40 years later.',
 };
 
 // A tiny conceptual quick-check after each stage. Every wrong option is a REAL, common
@@ -151,6 +164,20 @@ export const QUIZ = {
         { t: 'about 1.4× (√2×) the circular speed — only a bit faster.', correct: true, why: 'Escape speed is just √2 ≈ 1.41× the orbit speed. Surprisingly little extra!' },
         { t: 'a truly enormous speed, far more than orbiting.', why: 'Nope — only about 41% faster than already circling.' },
         { t: 'the same speed, just aimed straight up.', why: 'Below escape speed it falls back whatever the direction — you genuinely need more speed.' },
+      ] },
+  ],
+  system: [
+    { q: 'Two planets circle a star — one close in, one far out. Which has the longer YEAR?',
+      options: [
+        { t: 'The far-out one.', correct: true, why: 'Farther planets move slower AND have a much bigger loop to finish — so their year is far longer. (Earth: 1 year; Neptune: 165!)' },
+        { t: 'The close-in one.', why: 'No — the inner planet is faster and has a shorter loop, so its year is short.' },
+        { t: 'Same — they share the same star.', why: 'Sharing a star doesn’t sync them. Distance sets the pace (Kepler’s 3rd law).' },
+      ] },
+    { q: 'A probe swings close past a fast-MOVING planet. It can come away…',
+      options: [
+        { t: 'faster — it borrowed some of the planet’s motion.', correct: true, why: 'A gravity slingshot: the probe steals a tiny bit of the moving planet’s motion and speeds up. Real spacecraft do exactly this.' },
+        { t: 'at exactly the same speed — gravity gives nothing free.', why: 'Past a STILL planet, true. But a MOVING planet hands over some of its motion — that’s the trick.' },
+        { t: 'slower — the planet’s gravity drags it back.', why: 'Coming in and leaving roughly cancel; past a moving planet the net effect is a BOOST, not a drag.' },
       ] },
   ],
 };
