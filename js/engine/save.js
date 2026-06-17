@@ -17,6 +17,7 @@ const DEFAULT = {
   feltForce: false,              // has the player felt a steady push become acceleration?
   feltOrbit: false,              // has the player put something into a stable orbit?
   feltSystem: false,             // has the player built a multi-world system?
+  feltLight: false,              // has the player bent/split light? (finale)
   // curiosities found off the main path
   curiosities: [],
   // ui / one-time

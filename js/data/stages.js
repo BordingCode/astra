@@ -9,6 +9,7 @@ export const STAGES = [
   { id: 'force', ico: '⇉', label: 'Force' },
   { id: 'orbit', ico: '⊙', label: 'Orbit' },
   { id: 'system', ico: '✲', label: 'System' },
+  { id: 'light', ico: '✦', label: 'Light' },
 ];
 
 // per-stage cosmos colours (nebula colA/colB in 0..1) — the world's mood shifts as you go
@@ -19,6 +20,7 @@ export const NEBULA = {
   force: { colA: [0.26, 0.14, 0.20], colB: [0.55, 0.32, 0.22], focus: [0.5, 0.5] },
   orbit: { colA: [0.10, 0.11, 0.30], colB: [0.28, 0.20, 0.52], focus: [0.5, 0.52] },
   system: { colA: [0.12, 0.10, 0.26], colB: [0.34, 0.26, 0.48], focus: [0.5, 0.5] },
+  light:  { colA: [0.20, 0.16, 0.34], colB: [0.50, 0.40, 0.30], focus: [0.5, 0.5] },
 };
 
 // "How it works" cards — shown once per stage, dismissible. Short.
@@ -77,6 +79,15 @@ export const HOWTO = {
     ],
     tip: 'The farther out a world orbits, the slower it moves and the longer its year.',
   },
+  light: {
+    title: 'Light — the journey’s end',
+    body: [
+      'You began as a speck in the dark. Now bring in the light.',
+      'A beam of light travels in straight lines — until it bounces off a mirror, or bends as it slows entering water or glass.',
+      'Aim the beam. And at the end, split white light into every colour it was hiding.',
+    ],
+    tip: 'Light bends when it slows — and white light is every colour at once, waiting to be fanned apart.',
+  },
 };
 
 // The single transferable idea per stage (used in the "you understand" beat + codex).
@@ -87,6 +98,7 @@ export const LESSON = {
   force: 'A force doesn’t set a speed — it changes one: a = F ÷ m. The same push moves a heavy mass less, and held steady it speeds things up without end. Every push also pushes back.',
   orbit: 'An orbit is just falling sideways fast enough to keep missing the ground. Gravity never lets go — the Moon, the Space Station, everything in orbit is in endless free-fall. Go faster than escape speed (only √2× the circular speed) and you never come back.',
   system: 'A solar system is many orbits at once — each world falling around the star at its own distance. The farther out, the slower it moves and the longer its year (Kepler’s 3rd law). And a moving world’s gravity can fling a passing probe faster, for free — a slingshot.',
+  light: 'Light is a wave that needs nothing to travel — it crosses empty space. It bounces (angle in = angle out) and bends when it slows entering water or glass; its colour, set by frequency, never changes — only its speed and wavelength. White light is every colour at once: a prism fans them out because violet bends the most.',
 };
 
 // "Whoa, and it's TRUE" facts surfaced at the right moment.
@@ -97,6 +109,7 @@ export const TRUTH = {
   force: 'A rocket has nothing to push against in space. It hurls gas out the back, and that hurls it forward — every push pushes back (Newton’s 3rd law).',
   orbit: 'Astronauts aren’t beyond gravity — at the Space Station’s height it’s still about 90% as strong. They float because they’re falling around the Earth, endlessly missing it.',
   system: 'Voyager 2 slingshot past Jupiter, Saturn, Uranus and Neptune in turn — borrowing a sliver of each planet’s motion to fling itself onward. It’s still flying, over 40 years later.',
+  light: 'A rainbow is sunlight bent and split inside millions of raindrops — and because the angle is fixed, everyone sees their OWN private rainbow, made of light from different drops, meant just for their eyes.',
 };
 
 // A tiny conceptual quick-check after each stage. Every wrong option is a REAL, common
@@ -178,6 +191,20 @@ export const QUIZ = {
         { t: 'faster — it borrowed some of the planet’s motion.', correct: true, why: 'A gravity slingshot: the probe steals a tiny bit of the moving planet’s motion and speeds up. Real spacecraft do exactly this.' },
         { t: 'at exactly the same speed — gravity gives nothing free.', why: 'Past a STILL planet, true. But a MOVING planet hands over some of its motion — that’s the trick.' },
         { t: 'slower — the planet’s gravity drags it back.', why: 'Coming in and leaving roughly cancel; past a moving planet the net effect is a BOOST, not a drag.' },
+      ] },
+  ],
+  light: [
+    { q: 'Light passes from air into water. What happens to it?',
+      options: [
+        { t: 'It slows down and bends — but its colour stays the same.', correct: true, why: 'In water light slows (to about ¾ of its space speed) and its wavelength shrinks — but its frequency, which IS its colour, doesn’t change. That’s why things keep their colour underwater.' },
+        { t: 'It speeds up and bends.', why: 'Light SLOWS in water — denser stuff slows it down. (It bends because it slows.)' },
+        { t: 'Its colour changes — to blue or green.', why: 'Colour is set by frequency, and that doesn’t change crossing into water. Only the speed and wavelength do.' },
+      ] },
+    { q: 'A prism splits white light into a rainbow because…',
+      options: [
+        { t: 'white light is all colours mixed, and each colour bends a different amount.', correct: true, why: 'White light is every colour at once. The prism bends violet the most and red the least, fanning them apart.' },
+        { t: 'the glass colours the light as it passes through.', why: 'The glass adds nothing — the colours were already inside the white light. The prism just separates them.' },
+        { t: 'the white light turns into colours inside the glass.', why: 'Nothing is created. The colours were always there, overlapping; the prism spreads them out.' },
       ] },
   ],
 };
