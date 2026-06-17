@@ -4,7 +4,8 @@ const KEY = 'astra.save.v1';
 const DEFAULT = {
   // stage progress
   scene: 'drift',
-  stagesDone: {},                // id -> true once cleared
+  stagesDone: {},                // id -> true once ALL its challenges are cleared
+  progress: {},                  // id -> number of challenges cleared (resume point)
   best: {},                      // id -> best score/closeness (stage-defined)
   // the currency: Insight, earned by correct predictions & discoveries
   insight: 0,
@@ -13,6 +14,7 @@ const DEFAULT = {
   // learning flags that gate later stages (cross-stage retrieval)
   feltFall: false,               // has the player SEEN acceleration in FALL? (gates ORBIT later)
   feltDrift: false,              // has the player seen frictionless constant motion?
+  feltForce: false,              // has the player felt a steady push become acceleration?
   // curiosities found off the main path
   curiosities: [],
   // ui / one-time

@@ -6,6 +6,7 @@ export const STAGES = [
   { id: 'drift', ico: '→', label: 'Drift' },
   { id: 'fall',  ico: '↓', label: 'Fall' },
   { id: 'throw', ico: '↗', label: 'Throw' },
+  { id: 'force', ico: '⇉', label: 'Force' },
 ];
 
 // per-stage cosmos colours (nebula colA/colB in 0..1) — the world's mood shifts as you go
@@ -13,6 +14,7 @@ export const NEBULA = {
   drift: { colA: [0.10, 0.12, 0.34], colB: [0.16, 0.42, 0.62], focus: [0.5, 0.5] },
   fall:  { colA: [0.20, 0.12, 0.30], colB: [0.45, 0.30, 0.30], focus: [0.5, 0.8] },
   throw: { colA: [0.12, 0.18, 0.34], colB: [0.30, 0.45, 0.40], focus: [0.5, 0.75] },
+  force: { colA: [0.26, 0.14, 0.20], colB: [0.55, 0.32, 0.22], focus: [0.5, 0.5] },
 };
 
 // "How it works" cards — shown once per stage, dismissible. Short.
@@ -44,6 +46,15 @@ export const HOWTO = {
     ],
     tip: 'Sideways speed never changes. Only the falling speeds up.',
   },
+  force: {
+    title: 'Force — push and shove',
+    body: [
+      'A push is a force. Give the same push to a heavy thing and a light thing — they don’t answer the same.',
+      'And a steady push doesn’t set a speed: it keeps ADDING speed, on and on.',
+      'Predict, then push — and watch what a force really does.',
+    ],
+    tip: 'Force makes things speed up or slow down — not simply move. Heavier resists more.',
+  },
 };
 
 // The single transferable idea per stage (used in the "you understand" beat + codex).
@@ -51,6 +62,7 @@ export const LESSON = {
   drift: 'In empty space, motion needs no force to continue — only a force can change it. (Newton’s 1st law)',
   fall:  'All masses fall the same: gravity adds speed equally. The widening trail is acceleration.',
   throw: 'A throw is two independent motions at once — steady sideways, accelerating down — which trace a parabola.',
+  force: 'A force doesn’t set a speed — it changes one: a = F ÷ m. The same push moves a heavy mass less, and held steady it speeds things up without end. Every push also pushes back.',
 };
 
 // "Whoa, and it's TRUE" facts surfaced at the right moment.
@@ -58,4 +70,5 @@ export const TRUTH = {
   drift: 'Voyager 1 was last pushed by a rocket in 1977. It has coasted ever since — and still is.',
   fall:  'On the Moon, with no air, a hammer and a feather hit the ground together. Apollo 15 filmed it.',
   throw: 'Drop a ball and fire one sideways at the same instant from the same height — they land together.',
+  force: 'A rocket has nothing to push against in space. It hurls gas out the back, and that hurls it forward — every push pushes back (Newton’s 3rd law).',
 };

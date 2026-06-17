@@ -9,6 +9,7 @@ import * as UI from './ui/hud.js';
 import { DriftScene } from './scenes/drift.js';
 import { FallScene } from './scenes/fall.js';
 import { ThrowScene } from './scenes/throw.js';
+import { ForceScene } from './scenes/force.js';
 
 const glCanvas = document.getElementById('gl');
 const fxCanvas = document.getElementById('fx');
@@ -64,9 +65,18 @@ const game = {
     if (id === 'drift') return true;
     if (id === 'fall') return !!this.state.stagesDone.drift;
     if (id === 'throw') return !!this.state.stagesDone.fall;
+    if (id === 'force') return !!this.state.stagesDone.throw;
     return false;
   },
   checkGates() { UI.refreshGates(this); },
+
+  // ---- per-challenge progress within a stage ----
+  // A scene calls this when it clears one of its several challenges. The big "you felt it"
+  // lesson screen only fires once the LAST challenge of a stage is cleared.
+  noteProgress(id, cleared) {
+    this.state.progress[id] = Math.max(this.state.progress[id] || 0, cleared);
+    this.persist();
+  },
 
   // ---- finishing a stage ----
   completeStage(id, score) {
@@ -120,6 +130,7 @@ function boot() {
   game.scenes.drift = new DriftScene();
   game.scenes.fall = new FallScene();
   game.scenes.throw = new ThrowScene();
+  game.scenes.force = new ForceScene();
   UI.init(game, { setAudioEnabled, resetSave: () => { Save.resetSave(); location.reload(); } });
   resize();
   game.checkGates();
