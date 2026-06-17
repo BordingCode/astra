@@ -45,8 +45,9 @@ body{font-family:"Outfit",system-ui,sans-serif;color:var(--ink);
 #objectives.collapsed #objList{display:none;}
 .obj-head{display:flex;align-items:center;gap:8px;}
 #objTitle{flex:1;font-weight:600;font-size:13px;color:var(--cyan);letter-spacing:.2px;}
-.mini{width:24px;height:24px;border-radius:8px;font-size:13px;color:var(--ink-dim);
+.mini{width:33px;height:33px;border-radius:9px;font-size:14px;color:var(--ink-dim);
   background:rgba(150,190,255,.10);border:1px solid rgba(150,190,255,.18);cursor:pointer;}
+.mini:active{transform:scale(.92);}
 #objList{margin-top:8px;display:flex;flex-direction:column;gap:7px;}
 .goal{font-size:12.5px;color:var(--ink);line-height:1.4;display:flex;gap:8px;align-items:flex-start;}
 .goal .dot{flex:none;width:9px;height:9px;border-radius:50%;margin-top:4px;background:var(--teal);

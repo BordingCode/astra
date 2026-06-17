@@ -24,6 +24,8 @@ const DEFAULT = {
   // ui / one-time
   predictMode: true,             // commit a prediction before each launch (toggle in menu)
   showMath: true,                // show the live, colour-coded formula layer (toggle in menu)
+  reduceMotion: false,           // suppress particle showers / heavy FX (toggle in menu)
+  predictedRight: {},            // stageId -> true if the player nailed that stage's key prediction
   coachSeen: {},                 // one-time coaching toasts already shown
   howtoSeen: {},                 // sceneId -> true once its "how it works" card was shown
   introSeen: false,

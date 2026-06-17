@@ -192,7 +192,7 @@ export class OrbitScene {
     this.phase = 'reveal';
     const gd = this.guess ? Math.hypot(this.guess.x - this.peri.x, this.guess.y - this.peri.y) : 999;
     import('../ui/hud.js').then(UI => {
-      if (gd < 60) { game.award(8); UI.toast(game, { kind: 'win', title: 'Fastest at its closest', sub: 'Spot on — a moon or planet races at its nearest point and dawdles when far. Equal areas in equal times (Kepler).' }); }
+      if (gd < 60) { game.award(12); game.state.predictedRight.orbit = true; UI.toast(game, { kind: 'win', title: 'You called it — fastest at its closest', sub: 'A moon or planet races at its nearest point and dawdles when far. Equal areas in equal times (Kepler).' }); }
       else UI.toast(game, { kind: 'fail', title: 'Fastest when CLOSEST', sub: 'It moves quickest at the point nearest the world, and slowest when far out — gravity is strongest up close. (Kepler’s 2nd law.)' });
     });
   }

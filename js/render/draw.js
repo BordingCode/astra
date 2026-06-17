@@ -1,15 +1,15 @@
 // draw.js — shared 2D canvas drawing helpers for ASTRA scenes.
 // The visual language: glowing motes on deep space, additive light, clean vectors.
 
-// ---- colour ----
-export function rgb01(hex) {
-  const h = hex.replace('#', '');
-  return [parseInt(h.slice(0, 2), 16) / 255, parseInt(h.slice(2, 4), 16) / 255, parseInt(h.slice(4, 6), 16) / 255];
+// ---- colour ---- (tolerant of 3- or 6-digit hex; never emits NaN)
+function hex6(hex) {
+  let h = String(hex).replace('#', '');
+  if (h.length === 3) h = h[0] + h[0] + h[1] + h[1] + h[2] + h[2];
+  const r = parseInt(h.slice(0, 2), 16), g = parseInt(h.slice(2, 4), 16), b = parseInt(h.slice(4, 6), 16);
+  return [isNaN(r) ? 255 : r, isNaN(g) ? 255 : g, isNaN(b) ? 255 : b];
 }
-export function hexA(hex, a) {
-  const h = hex.replace('#', '');
-  return `rgba(${parseInt(h.slice(0, 2), 16)},${parseInt(h.slice(2, 4), 16)},${parseInt(h.slice(4, 6), 16)},${a})`;
-}
+export function rgb01(hex) { const [r, g, b] = hex6(hex); return [r / 255, g / 255, b / 255]; }
+export function hexA(hex, a) { const [r, g, b] = hex6(hex); return `rgba(${r},${g},${b},${a})`; }
 
 // ---- a glowing mote (the player's matter) ----
 export function drawMote(ctx, x, y, r, color, { time = 0, pulse = 0 } = {}) {

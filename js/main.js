@@ -60,7 +60,7 @@ const game = {
     if (this.scene.enter) this.scene.enter(this);
     UI.setSceneTitle(this.scene.title || name);
     UI.refreshGoals(this);
-    UI.maybeHowto(this, name);
+    if (this.state.introSeen) UI.maybeHowto(this, name);   // on first boot, wait until intro is dismissed
     this.persist();
   },
 
@@ -168,14 +168,14 @@ function boot() {
   game.scenes.orbit = new OrbitScene();
   game.scenes.system = new SystemScene();
   game.scenes.light = new LightScene();
-  UI.init(game, { setAudioEnabled, resetSave: () => { Save.resetSave(); location.reload(); } });
+  UI.init(game, { setAudioEnabled, setReduceMotion: (on) => { gl.lowMotion = on; }, resetSave: () => { Save.resetSave(); location.reload(); } });
   resize();
   game.checkGates();
   const saved = game.state.scene;
   game._activate(saved && game.scenes[saved] && game.stageUnlocked(saved) ? saved : 'drift');
   UI.setInsight(game.state.insight);
   loop.start();
-  if (!game.state.introSeen) UI.showIntro(game, () => { game.state.introSeen = true; game.persist(); });
+  if (!game.state.introSeen) UI.showIntro(game, () => { game.state.introSeen = true; game.persist(); UI.maybeHowto(game, game.sceneName); });
 }
 
 boot();

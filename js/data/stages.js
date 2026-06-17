@@ -112,16 +112,18 @@ export const TRUTH = {
   light: 'A rainbow is sunlight bent and split inside millions of raindrops — and because the angle is fixed, everyone sees their OWN private rainbow, made of light from different drops, meant just for their eyes.',
 };
 
-// One-line essence of each law, for the journey-complete recap.
-export const FINALE_LINES = {
-  drift: 'In empty space, motion just keeps going.',
-  fall:  'Everything falls the same — and never stops speeding up.',
-  throw: 'A throw is two motions at once, tracing a curve.',
-  force: 'a = F ÷ m — and every push pushes back.',
-  orbit: 'An orbit is falling sideways, forever missing the ground.',
-  system: 'Many worlds circle a star; the far ones run slow.',
-  light: 'Light bounces, bends — and hides every colour.',
-};
+// The journey as a CHAIN the player retraces tap-by-tap at the end — each step says WHY the
+// previous law led to the next, so they assemble the whole story instead of just reading it.
+export const FINALE_CHAIN = [
+  { ico: '·', label: 'a speck',  line: 'You began as a single speck of matter, adrift in the dark.' },
+  { ico: '→', label: 'Drift',    line: 'First it learned to move — and out here, motion never stops on its own.' },
+  { ico: '↓', label: 'Fall',     line: 'Give it a world, and that motion becomes a fall — every speck falling the same.' },
+  { ico: '↗', label: 'Throw',    line: 'Add a sideways push to the fall, and the path bends into a curve — a throw.' },
+  { ico: '⇉', label: 'Force',    line: 'But what bends a motion at all? A force — and the same push moves a heavy thing less.' },
+  { ico: '⊙', label: 'Orbit',    line: 'Push it sideways fast enough as it falls, and it falls AROUND the world — an orbit.' },
+  { ico: '✲', label: 'System',   line: 'Many such falls around one star make a system — far worlds slow, near worlds quick.' },
+  { ico: '✦', label: 'Light',    line: 'And across all that space travels light — bouncing, bending, hiding every colour.' },
+];
 
 // A tiny conceptual quick-check after each stage. Every wrong option is a REAL, common
 // misconception (vetted) — answering either way shows a one-line "why". Keep them playful.

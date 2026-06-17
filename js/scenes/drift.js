@@ -39,7 +39,7 @@ export class DriftScene {
       ];
       this.nudges = 1;
     } else if (this.type === 'lead') {
-      this.gates = [{ x: W * 0.78, y: H * 0.16, r: 34, vx: 0, vy: 90 }]; // drifting downward
+      this.gates = [{ x: W * 0.78, y: H * 0.26, r: 34, vx: 0, vy: 78 }]; // drifting downward, clear of the panel
       this.nudges = 0;
     }
     this.reset(game);

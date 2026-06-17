@@ -83,7 +83,7 @@ export class LightScene {
   norm(x, y) { const m = Math.hypot(x, y) || 1; return { x: x / m, y: y / m }; }
 
   buildChips(game) {
-    const W = game.W, cy = game.H * 0.90, h = 40;
+    const W = game.W, cy = game.H * 0.86, h = 40;
     const labels = [['red', 'Red'], ['same', 'Same'], ['violet', 'Violet']];
     const w = Math.min(110, (W - 40) / 3 - 8); const total = w * 3 + 16; let x = (W - total) / 2;
     this.chips = labels.map(([id, l]) => { const c = { id, label: l, x, y: cy - h / 2, w, h }; x += w + 8; return c; });
@@ -191,7 +191,7 @@ export class LightScene {
   prismReveal(game) {
     const correct = this.guess === 'violet';
     import('../ui/hud.js').then(UI => {
-      if (correct) { game.award(8); UI.toast(game, { kind: 'win', title: 'Violet bends the most', sub: 'White light is every colour at once. The prism bends violet hardest and red least — so they fan apart into a rainbow.' }); }
+      if (correct) { game.award(12); game.state.predictedRight.light = true; UI.toast(game, { kind: 'win', title: 'You called it — violet', sub: 'White light is every colour at once. The prism bends violet hardest and red least — so they fan apart into a rainbow.' }); }
       else UI.toast(game, { kind: 'fail', title: 'Violet bends the most', sub: 'Each colour bends a little differently — violet most, red least. That spread is what fans white light into a rainbow.' });
       UI.flash('White light was every colour all along — now you can see them.');
     });
@@ -235,11 +235,12 @@ export class LightScene {
     // wall
     ctx.save(); ctx.strokeStyle = '#ff9a8a'; ctx.lineWidth = 5; ctx.lineCap = 'round';
     ctx.beginPath(); ctx.moveTo(this.wall.a.x, this.wall.a.y); ctx.lineTo(this.wall.b.x, this.wall.b.y); ctx.stroke(); ctx.restore();
-    this.drawTarget(ctx, this.target, this.locked, t);
     const res = this.traceReflect();
-    this.beam(ctx, res.pts, this.locked ? '#fff' : BEAM);
+    const onTarget = this.aiming && res.hit;                 // telegraph success while aiming
+    this.drawTarget(ctx, this.target, this.locked || onTarget, t);
+    this.beam(ctx, res.pts, this.locked || onTarget ? '#7dffb0' : BEAM, onTarget ? 20 : 14);
     this.source(ctx, t);
-    label(ctx, this.src.x, this.src.y - 26, this.phase === 'done' ? '' : 'drag to aim the beam', { color: hexA(BEAM, 0.8), size: 12 });
+    if (this.phase !== 'done') label(ctx, this.src.x - 8, this.src.y - 26, 'drag to aim the beam', { color: hexA(BEAM, 0.8), size: 12, align: 'left' });
   }
 
   renderRefract(ctx, game, t) {
@@ -251,14 +252,15 @@ export class LightScene {
     ctx.restore();
     label(ctx, game.W * 0.12, this.surfaceY - 14, 'air', { color: 'rgba(255,255,255,.5)', size: 11 });
     label(ctx, game.W * 0.12, this.surfaceY + 18, 'water', { color: hexA('#aee0ff', .7), size: 11 });
-    this.drawTarget(ctx, this.target, this.locked, t);
     const res = this.traceRefract();
+    const onTarget = this.aiming && res.hit;                 // telegraph success while aiming
+    this.drawTarget(ctx, this.target, this.locked || onTarget, t);
     // draw the normal at the entry point (dashed)
     if (res.pts.length > 1) { const p = res.pts[1]; ctx.save(); ctx.strokeStyle = 'rgba(255,255,255,.3)'; ctx.setLineDash([4, 5]);
       ctx.beginPath(); ctx.moveTo(p.x, p.y - 34); ctx.lineTo(p.x, p.y + 34); ctx.stroke(); ctx.restore(); }
-    this.beam(ctx, res.pts, this.locked ? '#fff' : BEAM);
+    this.beam(ctx, res.pts, this.locked || onTarget ? '#7dffb0' : BEAM, onTarget ? 20 : 14);
     this.source(ctx, t);
-    label(ctx, this.src.x, this.src.y - 24, this.phase === 'done' ? '' : 'drag to aim into the water', { color: hexA(BEAM, 0.8), size: 12 });
+    if (this.phase !== 'done') label(ctx, this.src.x - 8, this.src.y - 24, 'drag to aim into the water', { color: hexA(BEAM, 0.8), size: 12, align: 'left' });
   }
 
   renderPrism(ctx, game, t) {

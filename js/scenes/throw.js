@@ -48,7 +48,7 @@ export class ThrowScene {
   resetAim() { this.aiming = false; this.aim = null; this.shot = null; this.flyT = 0; this.trail = []; this.blocked = false; }
 
   buildChips(game) {
-    const W = game.W, cy = game.H * 0.90, h = 40;
+    const W = game.W, cy = game.H * 0.86, h = 40;
     if (game.state.predictMode) {
       const labels = [['drop', 'Dropped first'], ['same', 'Same time'], ['fire', 'Fired first']];
       const w = Math.min(120, (W - 40) / 3 - 8); const total = w * 3 + 16; let x = (W - total) / 2;
@@ -142,8 +142,8 @@ export class ThrowScene {
       game.gl.burst(this.dfX, this.groundY, 14, { color: [0.68, 0.94, 1], speed: 120, size: 13, life: 0.6, alpha: 0.8 });
       game.gl.burst(this.dfX + this.dfv * this.dfEnd, this.groundY, 14, { color: [0.68, 0.94, 1], speed: 120, size: 13, life: 0.6, alpha: 0.8 });
       import('../ui/hud.js').then(UI => {
-        if (this.guess === 'same' || this.guess === null) { if (this.guess === 'same') game.award(8);
-          UI.toast(game, { kind: 'win', title: 'They land together', sub: 'Sideways motion doesn’t change the falling. Each one’s drop is identical — so they touch down at the same instant.' }); }
+        if (this.guess === 'same' || this.guess === null) { if (this.guess === 'same') { game.award(12); game.state.predictedRight.throw = true; }
+          UI.toast(game, { kind: 'win', title: this.guess === 'same' ? 'You called it — together' : 'They land together', sub: 'Sideways motion doesn’t change the falling. Each one’s drop is identical — so they touch down at the same instant.' }); }
         else UI.toast(game, { kind: 'fail', title: 'Actually — together', sub: 'The fired one travels far sideways, yet it falls at exactly the same rate as the dropped one. Up-down and side-to-side are independent.' });
         UI.flash('Drop and fire from the same height — they hit the ground at the very same moment.');
       });

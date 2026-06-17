@@ -14,7 +14,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="css/style.css?v=4" />
+<link rel="stylesheet" href="css/style.css?v=5" />
 </head>
 <body>
 <div id="stage">
@@ -34,6 +34,7 @@
   <!-- objectives -->
   <aside id="objectives" class="panel">
     <div class="obj-head"><span id="objTitle">Objective</span>
+      <button class="mini" id="restartBtn" title="Restart this challenge">↺</button>
       <button class="mini" id="howtoBtn" title="How this stage works">?</button>
       <button class="mini" id="objToggle">–</button></div>
     <div id="objList"></div>
@@ -61,6 +62,7 @@
       <label class="row"><span>Sound</span><input type="checkbox" id="soundToggle" checked /></label>
       <label class="row"><span>Predict before launch<br/><small class="dim">Call the result first — a right guess earns Insight, a wrong one teaches</small></span><input type="checkbox" id="predictToggle" checked /></label>
       <label class="row"><span>Show the maths<br/><small class="dim">A live, colour-coded formula that moves with the action</small></span><input type="checkbox" id="mathToggle" checked /></label>
+      <label class="row"><span>Reduce motion<br/><small class="dim">Calm the particle bursts and background sparkle</small></span><input type="checkbox" id="motionToggle" /></label>
       <button class="ghost hidden" id="journeyBtn">✦ Replay your journey</button>
       <button class="danger" id="resetBtn">Reset all progress</button>
       <p class="credit">ASTRA · a journey through the laws of motion<br/>Every simulation is real physics.</p>
@@ -121,7 +123,7 @@
   </div>
 </div>
 
-<script type="module" src="js/main.js?v=7"></script>
+<script type="module" src="js/main.js?v=8"></script>
 <script>
   // --- resilience layer (plain script, runs even if the game module fails to boot) ---
   (function () {

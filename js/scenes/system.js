@@ -56,14 +56,14 @@ export class SystemScene {
       this.start = { x: W * 0.13, y: H * 0.56 };
       this.mover = { x: W * 0.55, y: H * 0.82, vx: 0, vy: -H * 0.12, R: 18, GM: 150 * 150 * 95 }; // heavy moving world
       this.mover0 = { x: this.mover.x, y: this.mover.y };
-      this.needBoost = 1.5; this.maxSpeed = 0;
+      this.needBoost = 1.4; this.maxSpeed = 0;
       this.phase = 'aim';
     }
     game.refreshGoals();
   }
 
   buildChips(game) {
-    const W = game.W, cy = game.H * 0.90, h = 40;
+    const W = game.W, cy = game.H * 0.86, h = 40;
     const labels = [['inner', 'Inner first'], ['same', 'Same time'], ['outer', 'Outer first']];
     const w = Math.min(120, (W - 40) / 3 - 8); const total = w * 3 + 16; let x = (W - total) / 2;
     this.chips = labels.map(([id, label]) => { const c = { id, label, x, y: cy - h / 2, w, h }; x += w + 8; return c; });
@@ -202,7 +202,7 @@ export class SystemScene {
   keplerReveal(game) {
     const correct = this.guess === 'inner';
     import('../ui/hud.js').then(UI => {
-      if (correct) { game.award(8); UI.toast(game, { kind: 'win', title: 'The inner world wins', sub: 'Closer in means faster AND a smaller loop — so it laps the star first. Farther out = slower and a much longer year. (Kepler’s 3rd law.)' }); }
+      if (correct) { game.award(12); game.state.predictedRight.system = true; UI.toast(game, { kind: 'win', title: 'You called it — the inner world', sub: 'Closer in means faster AND a smaller loop — so it laps the star first. Farther out = slower and a much longer year. (Kepler’s 3rd law.)' }); }
       else UI.toast(game, { kind: 'fail', title: 'The INNER world finishes first', sub: 'It’s both faster and has less distance to cover. Farther planets are slower and have far longer years — T² grows with r³.' });
     });
   }
@@ -247,7 +247,9 @@ export class SystemScene {
     if (this.body && this.phase !== 'done') drawMote(ctx, this.body.x, this.body.y, this.type === 'slingshot' ? 8 : 11, COL, { time: t });
     if (this.phase === 'aim' && !this.aiming && this.start) {
       drawMote(ctx, this.start.x, this.start.y, this.type === 'slingshot' ? 8 : 11, COL, { time: t, pulse: 1 });
-      label(ctx, this.start.x, this.start.y - 26, this.type === 'slingshot' ? 'drag to launch the probe →' : 'drag to launch →', { color: hexA(COL, 0.8), size: 12 });
+      const lbl = this.type === 'slingshot' ? 'drag to launch the probe →' : 'drag to launch →';
+      const leftEdge = this.start.x < game.W * 0.28;
+      label(ctx, this.start.x - (leftEdge ? 6 : 0), this.start.y - 26, lbl, { color: hexA(COL, 0.8), size: 12, align: leftEdge ? 'left' : 'center' });
     }
     // chips
     if (this.type === 'kepler3' && this.phase === 'predict') {

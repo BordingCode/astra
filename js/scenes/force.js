@@ -56,7 +56,7 @@ export class ForceScene {
   }
 
   buildChips(game) {
-    const W = game.W, cy = game.H * 0.90, h = 40;
+    const W = game.W, cy = game.H * 0.86, h = 40;
     if (game.state.predictMode) {
       const labels = [['heavy', 'Heavy first'], ['same', 'Same time'], ['light', 'Light first']];
       const w = Math.min(120, (W - 40) / 3 - 8); const total = w * 3 + 16; let x = (W - total) / 2;
@@ -119,8 +119,8 @@ export class ForceScene {
         game.gl.burst(this.finishX, this.laneL, 20, { color: [0.42, 0.9, 1], speed: 140, size: 14, life: 0.7, alpha: 0.85 });
         import('../ui/hud.js').then(UI => {
           if (this.guess === 'light' || this.guess === null) {
-            if (this.guess === 'light') game.award(8);
-            UI.toast(game, { kind: 'win', title: 'The light one wins',
+            if (this.guess === 'light') { game.award(12); game.state.predictedRight.force = true; }
+            UI.toast(game, { kind: 'win', title: this.guess === 'light' ? 'You called it — the light one' : 'The light one wins',
               sub: 'Same push, but a = F ÷ m — less mass means more acceleration. The heavy one is sluggish.' });
           } else if (this.guess === 'same') {
             UI.toast(game, { kind: 'fail', title: 'Not the same this time',
@@ -241,9 +241,21 @@ export class ForceScene {
     for (const p of this.puffs) { ctx.globalAlpha = Math.max(0, p.life / 0.7) * 0.8;
       ctx.fillStyle = hexA('#ffcaa0', 0.9); ctx.beginPath(); ctx.arc(p.x, p.y, 5, 0, Math.PI * 2); ctx.fill(); }
     ctx.restore();
+    // direction guidance: you recoil AWAY from where you tap, so tap on the FAR side of the gate
+    if (this.phase === 'play') {
+      const dx = this.rGate.x - this.mote.x, dy = this.rGate.y - this.mote.y, d = Math.hypot(dx, dy) || 1;
+      const ux = dx / d, uy = dy / d;
+      // faint "goal" arrow from the mote toward the gate
+      drawArrow(ctx, this.mote.x + ux * 18, this.mote.y + uy * 18, this.mote.x + ux * 46, this.mote.y + uy * 46, hexA('#ffd66b', 0.5), { width: 2, head: 8 });
+      // pulsing "tap here" marker on the opposite side (tap there → recoil toward the gate)
+      const hx = this.mote.x - ux * 62, hy = this.mote.y - uy * 62, pr = 15 + 3 * Math.sin(t * 5);
+      ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.strokeStyle = hexA(ACC, 0.8); ctx.lineWidth = 2;
+      ctx.setLineDash([4, 5]); ctx.beginPath(); ctx.arc(hx, hy, pr, 0, Math.PI * 2); ctx.stroke(); ctx.restore();
+      label(ctx, hx, hy + pr + 12, 'tap here', { color: hexA(ACC, 0.9), size: 11 });
+    }
     drawMote(ctx, this.mote.x, this.mote.y, 13, ACC, { time: t, pulse: 1 });
     label(ctx, this.mote.x, this.mote.y - 30, `${this.throwsLeft} throws`, { color: 'rgba(255,255,255,.8)', size: 12 });
-    if (this.phase === 'play') label(ctx, game.W / 2, game.H * 0.88, 'Tap to throw mass away — you recoil the opposite way', { size: 13, color: '#fff' });
+    if (this.phase === 'play') label(ctx, game.W / 2, game.H * 0.9, 'Tap BEHIND you (away from the gate) — you shoot off the other way', { size: 12.5, color: '#fff' });
   }
 
   drawChip(ctx, c) {

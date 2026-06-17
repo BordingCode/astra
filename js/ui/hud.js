@@ -1,6 +1,6 @@
 // hud.js — all DOM UI for ASTRA: tabs, objectives, toasts, flash, how-it-works,
 // the stage-clear lesson reveal, field notes, intro, menu.
-import { STAGES, HOWTO, LESSON, TRUTH, QUIZ, FINALE_LINES } from '../data/stages.js';
+import { STAGES, HOWTO, LESSON, TRUTH, QUIZ, FINALE_CHAIN } from '../data/stages.js';
 
 const $ = (id) => document.getElementById(id);
 let G = null;
@@ -12,9 +12,9 @@ export function init(game, h) {
 
   $('menuBtn').addEventListener('click', () => { $('journeyBtn').classList.toggle('hidden', !game.state.gameComplete); $('menu').classList.remove('hidden'); });
   $('journeyBtn').addEventListener('click', () => { $('menu').classList.add('hidden'); showFinale(game); });
-  $('finaleClose').addEventListener('click', () => $('finale').classList.add('hidden'));
   $('codexBtn').addEventListener('click', () => { renderCodex(game); $('codex').classList.remove('hidden'); });
   $('howtoBtn').addEventListener('click', () => openHowto(game.sceneName, true));
+  $('restartBtn').addEventListener('click', () => { if (game.scene && game.scene.startChallenge) { game.scene.startChallenge(game); game.sfx.pickup(); } });
   $('objToggle').addEventListener('click', () => {
     const o = $('objectives'); o.classList.toggle('collapsed');
     $('objToggle').textContent = o.classList.contains('collapsed') ? '+' : '–';
@@ -37,6 +37,11 @@ export function init(game, h) {
   const math = $('mathToggle');
   math.checked = game.state.showMath;
   math.addEventListener('change', () => { game.state.showMath = math.checked; game.persist(); });
+
+  const motion = $('motionToggle');
+  motion.checked = game.state.reduceMotion;
+  motion.addEventListener('change', () => { game.state.reduceMotion = motion.checked; game.persist(); if (hooks.setReduceMotion) hooks.setReduceMotion(motion.checked); });
+  if (hooks.setReduceMotion) hooks.setReduceMotion(game.state.reduceMotion);
 
   $('resetBtn').addEventListener('click', () => { if (confirm('Reset all progress?')) hooks.resetSave && hooks.resetSave(); });
 
@@ -94,6 +99,7 @@ const TGLYPH = { win: '✦', fail: '⚐', hint: '✦', info: '◈' };
 const TCOL = { win: '#ffd66b', fail: '#ff9a8a', hint: '#ffd66b', info: '#6be4ff' };
 export function toast(game, { kind = 'info', title, sub, fact, glyph }) {
   const wrap = $('toasts');
+  wrap.querySelectorAll('.toast').forEach(c => c.remove());   // only ever ONE toast — never stack
   const card = document.createElement('div'); card.className = 'toast ' + kind;
   card.style.setProperty('--c', TCOL[kind] || '#6be4ff');
   const coaching = kind === 'fail' || kind === 'hint';
@@ -137,7 +143,8 @@ export function openHowto(name, force) {
 
 // ---------------- stage clear: the lesson + a true fact ----------------
 export function showClear(game, stageId, onNext) {
-  $('clearTitle').textContent = 'You felt it.';
+  // credit the player's reasoning, not just the sensation, when they nailed the key prediction
+  $('clearTitle').textContent = game.state.predictedRight[stageId] ? 'You called it.' : 'You felt it.';
   $('clearBody').innerHTML =
     `<p class="clear-lesson">${LESSON[stageId] || ''}</p>` +
     (TRUTH[stageId] ? `<div class="clear-truth"><b>True story:</b> ${TRUTH[stageId]}</div>` : '');
@@ -179,7 +186,7 @@ export function showQuiz(game, stageId, onDone) {
       else if (o === opt) b.classList.add('wrong');
       else b.classList.add('dim');
     });
-    if (opt.correct) { game.award(4); game.sfx.tick(); } else game.sfx.reject();
+    if (opt.correct) { game.award(6); game.sfx.tick(); } else game.sfx.reject();
     why.innerHTML = (opt.correct ? '✓ ' : '') + (opt.why || (correctOpt && correctOpt.why) || item.explain || '');
     why.classList.toggle('ok', !!opt.correct);
     why.classList.remove('hidden');
@@ -205,13 +212,29 @@ export function renderCodex(game) {
 }
 
 // ---------------- finale: the journey-complete recap ----------------
+// The player RETRACES the whole story, one link at a time — assembling how each law led to the
+// next, rather than reading a finished list. That retelling-by-doing is the deepest "I get it".
 export function showFinale(game) {
-  const body = $('finaleBody');
-  body.innerHTML = STAGES.map((st, i) =>
-    `<div class="fin-law" style="animation-delay:${i * 0.12}s"><span class="fin-ico">${st.ico}</span><span>${FINALE_LINES[st.id] || ''}</span></div>`).join('');
-  const challenges = STAGES.length * 3;
-  $('finaleStats').textContent = `${STAGES.length} laws · ${challenges} challenges · ✦ ${game.state.insight} insight`;
+  const body = $('finaleBody'); body.innerHTML = '';
+  const stats = $('finaleStats'); stats.classList.add('hidden');
+  const btn = $('finaleClose');
+  let i = 0;
+  function reveal() {
+    const step = FINALE_CHAIN[i++];
+    const d = document.createElement('div'); d.className = 'fin-law';
+    d.innerHTML = `<span class="fin-ico">${step.ico}</span><span>${step.line}</span>`;
+    body.appendChild(d); body.scrollTop = body.scrollHeight;
+    if (i < FINALE_CHAIN.length) { btn.textContent = i === 1 ? 'Then… ›' : 'And then… ›'; }
+    else {
+      btn.textContent = 'Wander freely ›';
+      stats.textContent = `${STAGES.length} laws · ${STAGES.length * 3} challenges · ✦ ${game.state.insight} insight`;
+      stats.classList.remove('hidden');
+      btn.onclick = () => $('finale').classList.add('hidden');
+    }
+  }
+  btn.onclick = reveal;
   $('finale').classList.remove('hidden');
+  reveal();                       // show the opening "a speck in the dark" line straight away
 }
 
 // ---------------- intro ----------------
