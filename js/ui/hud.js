@@ -1,6 +1,6 @@
 // hud.js — all DOM UI for ASTRA: tabs, objectives, toasts, flash, how-it-works,
 // the stage-clear lesson reveal, field notes, intro, menu.
-import { STAGES, HOWTO, LESSON, TRUTH, QUIZ, FINALE_CHAIN, REASONED } from '../data/stages.js';
+import { STAGES, HOWTO, LESSON, TRUTH, QUIZ, FINALE_SPINE, FINALE_FEEDS, REASONED } from '../data/stages.js';
 
 const $ = (id) => document.getElementById(id);
 let G = null;
@@ -279,30 +279,122 @@ export function renderCodex(game) {
   });
 }
 
-// ---------------- finale: the journey-complete recap ----------------
-// The player RETRACES the whole story, one link at a time — assembling how each law led to the
-// next, rather than reading a finished list. That retelling-by-doing is the deepest "I get it".
+// ---------------- finale: the player-ASSEMBLED spine ----------------
+// The deepest "I could retell it" lever (curriculum §4.2 + field-notes "player-ASSEMBLED
+// lineage, not a told recap"). Instead of reading a finished list, the player TAPS each stage
+// back into the spine IN ORDER. Every correct tap draws a connector and reveals FINALE_FEEDS —
+// the one line showing how the PREVIOUS stage's lesson becomes this one's raw material
+// (product→raw-material). A wrong/early tap never punishes: it nudges "what did you need before
+// this?". After a pause, a "Show me" button auto-assembles the rest so a watcher isn't blocked.
 export function showFinale(game) {
-  const body = $('finaleBody'); body.innerHTML = '';
+  const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const spineEl = $('finaleSpine'); spineEl.innerHTML = '';
+  const poolEl = $('finalePool'); poolEl.innerHTML = '';
+  const promptEl = $('finalePrompt');
   const stats = $('finaleStats'); stats.classList.add('hidden');
-  const btn = $('finaleClose');
-  let i = 0;
-  function reveal() {
-    const step = FINALE_CHAIN[i++];
-    const d = document.createElement('div'); d.className = 'fin-law';
-    d.innerHTML = `<span class="fin-ico">${step.ico}</span><span>${step.line}</span>`;
-    body.appendChild(d); body.scrollTop = body.scrollHeight;
-    if (i < FINALE_CHAIN.length) { btn.textContent = i === 1 ? 'Then… ›' : 'And then… ›'; }
-    else {
-      btn.textContent = 'Wander freely ›';
-      stats.textContent = `${STAGES.length} laws · ${STAGES.length * 3} challenges · ✦ ${game.state.insight} insight`;
-      stats.classList.remove('hidden');
-      btn.onclick = () => $('finale').classList.add('hidden');
+  const showBtn = $('finaleShow'); showBtn.classList.add('hidden');
+  const closeBtn = $('finaleClose'); closeBtn.classList.add('hidden');
+
+  // stage id → its label/icon, from the canonical STAGES data
+  const meta = {}; STAGES.forEach(s => { meta[s.id] = s; });
+  const order = FINALE_SPINE;          // correct spine order
+  let placed = 0;                       // how many are correctly on the spine
+  let idleTimer = null;
+  const chips = {};                     // id → pool chip element
+
+  function setPrompt() {
+    if (placed >= order.length) { promptEl.textContent = ''; return; }
+    promptEl.textContent = placed === 0
+      ? 'Where does it all begin? Tap the very first idea.'
+      : `What did the ${meta[order[placed - 1]].label} need before it? Build the next link.`;
+  }
+
+  function armIdle() {
+    if (idleTimer) clearTimeout(idleTimer);
+    if (placed >= order.length) return;
+    // graceful fallback: after a quiet pause, offer to auto-assemble the rest for a watcher
+    idleTimer = setTimeout(() => showBtn.classList.remove('hidden'), 9000);
+  }
+
+  // build the assembled-spine row for one stage (connector from the previous + the feed line)
+  function placeChip(id, fromShowMe) {
+    const m = meta[id]; const fd = FINALE_FEEDS[id];
+    const row = document.createElement('div');
+    row.className = 'fin-link' + (reduce ? ' nomotion' : '');
+    if (placed > 0) row.innerHTML = '<span class="fin-conn"></span>';
+    row.innerHTML += `<span class="fin-ico">${m.ico}</span>`
+      + `<span class="fin-feed"><b>${m.label}</b> — ${fd.feed}</span>`;
+    spineEl.appendChild(row);
+    spineEl.scrollTop = spineEl.scrollHeight;
+    placed++;
+    if (!fromShowMe) game.sfx.tick();
+    if (placed >= order.length) finish();
+    else { setPrompt(); armIdle(); }
+  }
+
+  function onTap(id) {
+    if (placed >= order.length) return;
+    const nextId = order[placed];
+    if (id === nextId) {
+      const chip = chips[id];
+      if (chip) { chip.classList.add('used'); chip.disabled = true; }
+      placeChip(id, false);
+    } else {
+      // gentle nudge — never punish. Point back to the prerequisite they skipped.
+      game.sfx.reject();
+      const fd = FINALE_FEEDS[id];
+      const need = fd.prereq ? meta[fd.prereq].label : 'the very beginning';
+      promptEl.textContent = fd.prereq
+        ? `Not yet — ${meta[id].label} is built from ${need}. What did you need before this?`
+        : `That's the start, but not its turn yet. What comes next in the chain?`;
+      const chip = chips[id];
+      if (chip && !reduce) { chip.classList.remove('nudge'); void chip.offsetWidth; chip.classList.add('nudge'); }
+      armIdle();
     }
   }
-  btn.onclick = reveal;
+
+  function finish() {
+    promptEl.textContent = 'You retraced the whole spine — every law built from the last.';
+    if (idleTimer) clearTimeout(idleTimer);
+    showBtn.classList.add('hidden');
+    stats.textContent = `${STAGES.length} laws · ${STAGES.length * 3} challenges · ✦ ${game.state.insight} insight`;
+    stats.classList.remove('hidden');
+    closeBtn.classList.remove('hidden');
+    if (!reduce) game.celebrate(window.innerWidth / 2, window.innerHeight * 0.5, [1, 0.84, 0.42]);
+    else game.sfx.win();
+  }
+
+  // "Show me" — auto-assemble whatever remains, gently, so a watcher isn't blocked
+  showBtn.onclick = () => {
+    showBtn.classList.add('hidden');
+    if (idleTimer) clearTimeout(idleTimer);
+    const step = () => {
+      if (placed >= order.length) return;
+      const id = order[placed];
+      const chip = chips[id]; if (chip) { chip.classList.add('used'); chip.disabled = true; }
+      placeChip(id, true);
+      if (placed < order.length) setTimeout(step, reduce ? 0 : 650);
+    };
+    step();
+  };
+  closeBtn.onclick = () => $('finale').classList.add('hidden');
+
+  // build the shuffled pool of stage chips (every stage, in random order, drag-free taps)
+  const shuffled = order.slice();
+  for (let k = shuffled.length - 1; k > 0; k--) { const j = Math.floor(Math.random() * (k + 1)); [shuffled[k], shuffled[j]] = [shuffled[j], shuffled[k]]; }
+  shuffled.forEach(id => {
+    const m = meta[id];
+    const b = document.createElement('button');
+    b.className = 'fin-chip'; b.type = 'button';
+    b.innerHTML = `<span class="fin-ico">${m.ico}</span><span>${m.label}</span>`;
+    b.onclick = () => onTap(id);
+    poolEl.appendChild(b);
+    chips[id] = b;
+  });
+
+  setPrompt();
+  armIdle();
   $('finale').classList.remove('hidden');
-  reveal();                       // show the opening "a speck in the dark" line straight away
 }
 
 // ---------------- intro ----------------

@@ -14,7 +14,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="css/style.css?v=7" />
+<link rel="stylesheet" href="css/style.css?v=8" />
 </head>
 <body>
 <div id="stage">
@@ -107,10 +107,13 @@
     <div class="finale-inner">
       <div class="finale-spark">✦</div>
       <h1>Your journey</h1>
-      <p class="finale-lede">From a single speck in the dark to the laws that run the universe.</p>
-      <div id="finaleBody" class="finale-laws"></div>
-      <p id="finaleStats" class="finale-stats"></p>
-      <button class="reveal-btn" id="finaleClose">Wander freely ›</button>
+      <p class="finale-lede">Now retrace it yourself. Tap each idea in the order it grew — each one is built from the one before.</p>
+      <div id="finaleSpine" class="finale-spine"></div>
+      <p id="finalePrompt" class="finale-prompt"></p>
+      <div id="finalePool" class="finale-pool"></div>
+      <p id="finaleStats" class="finale-stats hidden"></p>
+      <button class="reveal-btn hidden" id="finaleShow">Show me ›</button>
+      <button class="reveal-btn hidden" id="finaleClose">Wander freely ›</button>
     </div>
   </div>
 
@@ -127,7 +130,7 @@
   </div>
 </div>
 
-<script type="module" src="js/main.js?v=10"></script>
+<script type="module" src="js/main.js?v=11"></script>
 <script>
   // --- resilience layer (plain script, runs even if the game module fails to boot) ---
   (function () {

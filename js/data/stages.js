@@ -139,6 +139,25 @@ export const FINALE_CHAIN = [
   { ico: '✦', label: 'Light',    line: 'And across all that space travels light — bouncing, bending, hiding every colour.' },
 ];
 
+// The ASSEMBLED-SPINE finale. The player taps the seven stages back in their proper order
+// (drift → fall → throw → force → orbit → system → light). Each correct tap draws a connector
+// to the one before it and reveals FEEDS[id] — the single sentence showing how the PREVIOUS
+// stage's lesson becomes the raw material for THIS one (product→raw-material, the spine rule).
+// `drift` opens the chain (nothing feeds it), so its line names what it gives the next stage.
+// `prereq` is the stage that MUST already sit on the spine before this one can be placed; a tap
+// that jumps ahead of its prereq triggers a gentle nudge instead of placing the chip.
+export const FINALE_SPINE = ['drift', 'fall', 'throw', 'force', 'orbit', 'system', 'light'];
+
+export const FINALE_FEEDS = {
+  drift: { prereq: null,    feed: 'Start here: a motion that, once begun, never stops on its own.' },
+  fall:  { prereq: 'drift', feed: 'Fall = drift, but now a world pulls it down — and it pulls every mass the same.' },
+  throw: { prereq: 'fall',  feed: 'Throw = drift sideways + fall at once — the two run independently into a curve.' },
+  force: { prereq: 'throw', feed: 'Force is what changed those motions all along: a = F ÷ m — the same push moves a heavy mass less.' },
+  orbit: { prereq: 'force', feed: 'Orbit = throw it sideways fast enough that the ground curves away as fast as it falls.' },
+  system:{ prereq: 'orbit', feed: 'System = many orbits at once — each world falling around the star, far ones slower (Kepler).' },
+  light: { prereq: 'system',feed: 'Light crosses all that empty space — the same void where the speck first began to drift.' },
+};
+
 // A tiny conceptual quick-check after each stage. Every wrong option is a REAL, common
 // misconception (vetted) — answering either way shows a one-line "why". Keep them playful.
 export const QUIZ = {
