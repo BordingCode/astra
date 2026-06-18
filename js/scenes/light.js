@@ -308,7 +308,7 @@ export class LightScene {
     if (this.type === 'refract') {
       const r = this.traceRefract();
       if (r.angR == null) return null;
-      return { x: game.W / 2, y: game.H * 0.90, size: 19, cells: [
+      return { x: game.W / 2, y: game.H * 0.86, size: 19, cells: [
         { sym: 'n', sub: '1', val: '1.0', color: '#ffd66b' }, { txt: 'sin' }, { sym: 'θ', sub: '1', val: Math.round(r.angI) + '°', color: '#ffd66b' }, { op: '=' },
         { sym: 'n', sub: '2', val: '1.33', color: '#aee0ff' }, { txt: 'sin' }, { sym: 'θ', sub: '2', val: Math.round(r.angR) + '°', color: '#aee0ff' },
       ] };

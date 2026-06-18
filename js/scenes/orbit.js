@@ -320,7 +320,8 @@ export class OrbitScene {
       const col = ratio < 0.99 ? ESCC : COL;                  // gold once it has actually SLOWED
       label(ctx, this.mote.x, this.mote.y - 26, `${ratio.toFixed(2)}× start speed`, { color: col, size: 12 });
       if (this.phase === 'predict') {
-        label(ctx, game.W / 2, this.chips[0].y - 24, 'It’s circling steadily. Thrust forward to climb — faster or slower up there?', { color: '#fff', size: 13.5 });
+        label(ctx, game.W / 2, this.chips[0].y - 44, 'Thrust forward to climb to a higher orbit.', { color: 'rgba(255,255,255,.8)', size: 12.5 });
+        label(ctx, game.W / 2, this.chips[0].y - 24, 'Faster or slower up there?', { color: '#fff', size: 14 });
         for (const c of this.chips) this.drawClimbChip(ctx, c);
       } else if (this.phase === 'run' && this.burned) {
         label(ctx, game.W / 2, game.H * 0.9, 'climbing — watch the speed…', { color: hexA(COL, 0.8), size: 12.5 });
@@ -360,6 +361,7 @@ export class OrbitScene {
   // live formula: circular-orbit speed, and the escape relation in the escape challenge
   mathLayer(game) {
     if (this.phase === 'done') return null;
+    if (this.type === 'climb' && this.phase === 'predict') return null;   // the chips live here — don't cover them
     if (this.type === 'escape') {
       return { x: game.W / 2, y: game.H * 0.88, size: 21, cells: [
         { sym: 'v', sub: 'esc', color: '#ffd66b' }, { op: '=' }, { txt: '√2', color: '#ffffff' }, { op: '·' },

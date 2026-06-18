@@ -266,6 +266,14 @@ export function updateReviewPrompt(game) {
   if (n === 0) { el.classList.add('hidden'); return; }
   el.textContent = `✦ ${n} ${n === 1 ? 'law' : 'laws'} to review ›`;
   el.classList.remove('hidden');
+  // sit just below the objectives panel so it never covers its rows/buttons
+  // (the panel's height changes when it expands/collapses or gains objectives)
+  const obj = $('objectives');
+  if (obj && getComputedStyle(obj).display !== 'none') {
+    el.style.top = (Math.round(obj.getBoundingClientRect().bottom) + 10) + 'px';
+  } else {
+    el.style.top = '';
+  }
   _revTimer = setTimeout(() => el.classList.add('hidden'), 6500);
 }
 

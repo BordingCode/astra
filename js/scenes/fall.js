@@ -131,8 +131,9 @@ export class FallScene {
     const aR = heights ? 13 : 17, bR = heights ? 13 : 10;
     drawMote(ctx, this.hx, aY, aR, HEAVY, { time: t, pulse: this.phase === 'predict' ? 1 : 0 });
     drawMote(ctx, this.lx, bY, bR, LIGHT, { time: t, pulse: this.phase === 'predict' ? 1 : 0 });
-    label(ctx, this.hx, aY - 30, heights ? 'tall drop' : 'heavy', { color: hexA(HEAVY, 0.85), size: 12 });
-    label(ctx, this.lx, bY - (heights ? 30 : 24), heights ? 'short drop' : 'light', { color: hexA(LIGHT, 0.85), size: 12 });
+    // labels BELOW the motes so the objectives panel (top-left) never hides them
+    label(ctx, this.hx, aY + aR + 15, heights ? 'tall drop' : 'heavy', { color: hexA(HEAVY, 0.85), size: 12 });
+    label(ctx, this.lx, bY + bR + 15, heights ? 'short drop' : 'light', { color: hexA(LIGHT, 0.85), size: 12 });
 
     if (this.phase === 'predict') {
       label(ctx, game.W / 2, this.chips[0].y - 22, this.challenges[this.ci].prompt, { size: 14.5, color: '#fff' });

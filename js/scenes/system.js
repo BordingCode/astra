@@ -308,6 +308,7 @@ export class SystemScene {
   // live formula: orbit speed falls off with distance — v = √(GM ÷ r)
   mathLayer(game) {
     if (this.type === 'slingshot' || this.phase === 'done') return null;
+    if (this.type === 'kepler3' && this.phase === 'predict') return null;   // the chips live here — don't cover them
     return { x: game.W / 2, y: game.H * 0.88, size: 21, cells: [
       { sym: 'v', color: '#aef0ff' }, { op: '=' },
       { sqrt: [{ frac: { num: [{ sym: 'G' }, { sym: 'M' }], den: [{ sym: 'r' }] }, color: '#cfe0ff' }] },
