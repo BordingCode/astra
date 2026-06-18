@@ -101,6 +101,20 @@ export const LESSON = {
   light: 'Light is a wave that needs nothing to travel — it crosses empty space. It bounces (angle in = angle out) and bends when it slows entering water or glass; its colour, set by frequency, never changes — only its speed and wavelength. White light is every colour at once: a prism fans them out because violet bends the most.',
 };
 
+// Reflect-back: when the player NAILED the stage's key prediction, restate the principle
+// back to them as THEIR OWN reasoning (not just "well done"). Phrased in second person and
+// aimed straight at the misconception each stage kills (per curriculum physics-astra.md §4 &
+// the FCI misconception language) — so the win reads "you reasoned it," not "you guessed it."
+export const REASONED = {
+  drift: 'You reasoned it: with no force and no friction, nothing changes a motion — so it just keeps going.',
+  fall:  'You reasoned it: heavier didn’t win — gravity pulls every mass in exact step, so they fall the same.',
+  throw: 'You reasoned it: the sideways push never touches the falling — two independent motions, landing together.',
+  force: 'You reasoned it: a steady push doesn’t set a speed, and the same push moves less mass more — a = F ÷ m, not gravity’s tie.',
+  orbit: 'You reasoned it: an orbit is just a fall moving sideways fast enough to keep missing the ground — gravity never lets go.',
+  system: 'You reasoned it: distance sets the pace — the farther world is slower and runs the longer year (Kepler), not synced by the shared star.',
+  light: 'You reasoned it: the prism adds no colour — white light already held them all, and violet simply bends the most.',
+};
+
 // "Whoa, and it's TRUE" facts surfaced at the right moment.
 export const TRUTH = {
   drift: 'Voyager 1 was last pushed by a rocket in 1977. It has coasted ever since — and still is.',

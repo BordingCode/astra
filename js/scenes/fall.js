@@ -91,19 +91,19 @@ export class FallScene {
     if (this.type === 'first') {
       game.gl.burst(this.hx, this.groundY, 20, { color: [1, 0.7, 0.48], speed: 150, size: 16, life: 0.7, alpha: 0.85 });
       game.gl.burst(this.lx, this.groundY, 16, { color: [0.42, 0.9, 1], speed: 150, size: 14, life: 0.7, alpha: 0.85 });
-      if (this.guess === 'same' || this.guess === null) { if (this.guess === 'same') { game.award(12); game.state.predictedRight.fall = true; }
+      if (this.guess === 'same' || this.guess === null) { if (this.guess === 'same') { game.awardReason(); game.state.predictedRight.fall = true; }
         UI.toast(game, { kind: 'win', title: this.guess === 'same' ? 'You called it — together' : 'They touched down together', sub: 'Mass doesn’t change the fall — gravity adds speed to every mass equally.' }); }
       else UI.toast(game, { kind: 'fail', title: `You called the ${this.guess} one`, sub: 'But they hit the ground at the same instant. The heavy one is pulled harder, yet it’s also harder to speed up. Those cancel exactly.' });
       UI.flash('Look at the trail: the gaps grow each beat — that growing gap IS acceleration.');
     } else if (this.type === 'halfway') {
       const actualY = this.topY + this.fallenPx(this.tHalf);
       const err = Math.abs(this.markerY - actualY);
-      if (err < 26) { game.award(12); game.state.predictedRight.fall = true; UI.toast(game, { kind: 'win', title: 'Spot on', sub: 'At HALF the time it has fallen only a QUARTER of the way — because it starts slow and keeps speeding up.' }); }
+      if (err < 26) { game.awardReason(); game.state.predictedRight.fall = true; UI.toast(game, { kind: 'win', title: 'Spot on', sub: 'At HALF the time it has fallen only a QUARTER of the way — because it starts slow and keeps speeding up.' }); }
       else UI.toast(game, { kind: 'fail', title: 'Lower than you’d think', sub: 'At half the fall-time it’s only a QUARTER of the way down — not halfway. It starts slow, then accelerates: distance grows with time SQUARED.' });
     } else if (this.type === 'heights') {
       // run the short drop to its (earlier) landing for the visual; both share accel
       game.gl.burst(this.lx, this.groundY, 16, { color: [0.42, 0.9, 1], speed: 150, size: 14, life: 0.7, alpha: 0.85 });
-      if (this.guess === 'short' || this.guess === null) { if (this.guess === 'short') { game.award(12); game.state.predictedRight.fall = true; }
+      if (this.guess === 'short' || this.guess === null) { if (this.guess === 'short') { game.awardReason(); game.state.predictedRight.fall = true; }
         UI.toast(game, { kind: 'win', title: this.guess === 'short' ? 'You called it — the short drop' : 'The short drop lands first', sub: 'Same acceleration for both — the one with less distance to fall simply gets there sooner.' }); }
       else UI.toast(game, { kind: 'fail', title: 'The shorter drop wins', sub: 'Both speed up identically; the time to land depends on the DISTANCE, not the mass. Less height → lands first.' });
     }

@@ -119,7 +119,7 @@ export class ForceScene {
         game.gl.burst(this.finishX, this.laneL, 20, { color: [0.42, 0.9, 1], speed: 140, size: 14, life: 0.7, alpha: 0.85 });
         import('../ui/hud.js').then(UI => {
           if (this.guess === 'light' || this.guess === null) {
-            if (this.guess === 'light') { game.award(12); game.state.predictedRight.force = true; }
+            if (this.guess === 'light') { game.awardReason(); game.state.predictedRight.force = true; }
             UI.toast(game, { kind: 'win', title: this.guess === 'light' ? 'You called it — the light one' : 'The light one wins',
               sub: 'Same push, but a = F ÷ m — less mass means more acceleration. The heavy one is sluggish.' });
           } else if (this.guess === 'same') {

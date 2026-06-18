@@ -133,6 +133,7 @@ input[type=checkbox]:checked::after{transform:translateX(19px);}
 #howtoBody p,#clearBody p{font-size:14px;line-height:1.55;color:var(--ink);margin:0 0 10px;}
 .howto-tip,.clear-truth{margin-top:14px;padding:11px 13px;border-radius:12px;font-size:13px;line-height:1.5;
   background:rgba(110,228,255,.10);border:1px solid rgba(110,228,255,.28);color:var(--cyan);}
+.clear-reason{font-size:14.5px;line-height:1.5;color:var(--cyan);font-weight:600;font-style:italic;margin:0 0 10px;}
 .clear-lesson{font-size:15px;line-height:1.55;color:#fff;font-weight:600;margin:6px 0 4px;}
 .clear-truth{background:rgba(255,214,107,.10);border-color:rgba(255,214,107,.30);color:var(--gold);}
 .clear-truth b{color:#fff;}

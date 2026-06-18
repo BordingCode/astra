@@ -15,6 +15,13 @@ import { OrbitScene } from './scenes/orbit.js';
 import { SystemScene } from './scenes/system.js';
 import { LightScene } from './scenes/light.js';
 
+// --- Reward economy (curriculum physics-astra.md §4.6: pay reasoning ≥ production) ---
+// A correct PREDICTION must never be out-paid by merely finishing/producing. So the
+// reasoning reward is pinned at-or-above the stage-clear (discovery) reward.
+const STAGE_REWARD  = 20;   // first-time stage clear (production / discovery)
+const REASON_REWARD = 20;   // a correct, committed prediction (reasoning) — ≥ STAGE_REWARD
+const CHALLENGE_REWARD = 6; // clearing one challenge within a stage
+
 const glCanvas = document.getElementById('gl');
 const fxCanvas = document.getElementById('fx');
 const ctx = fxCanvas.getContext('2d');
@@ -31,6 +38,8 @@ const game = {
 
   persist() { Save.save(this.state); },
   award(n) { this.state.insight += n; UI.setInsight(this.state.insight); this.persist(); },
+  // Pay a correct, committed prediction. Routed through one constant so reasoning stays ≥ production.
+  awardReason() { this.award(REASON_REWARD); },
   spend(n) { if (this.state.insight < n) return false; this.state.insight -= n; UI.setInsight(this.state.insight); this.persist(); return true; },
 
   // one-time coaching toast
@@ -90,7 +99,7 @@ const game = {
     const firstTime = !this.state.stagesDone[id];
     this.state.stagesDone[id] = true;
     if (score != null && (this.state.best[id] == null || score > this.state.best[id])) this.state.best[id] = score;
-    if (firstTime) this.award(20);
+    if (firstTime) this.award(STAGE_REWARD);
     this.persist();
     this.checkGates();
     UI.syncReview(this); UI.updateReviewPrompt(this);   // seed this stage's concepts into spaced review

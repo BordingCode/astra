@@ -18,6 +18,10 @@ export class OrbitScene {
     this.challenges = [
       { type: 'cannonball', prompt: 'Fling it so it falls round the world — not into it, not away' },
       { type: 'kepler',     prompt: 'On this ellipse, tap where it moves FASTEST' },
+      // The flagship cross-stage refusal (curriculum physics-astra.md ORBIT + §4/§5): the player
+      // COMMITS to "thrust forward to climb higher → stay faster" — the sim then violates it: the
+      // craft climbs but arrives SLOWER, reaching back to the energy axis (kinetic ↔ height).
+      { type: 'climb',      prompt: 'Thrust forward to climb to a higher orbit — then watch your speed' },
       { type: 'escape',     prompt: 'Give it enough speed to break free forever' },
     ];
   }
@@ -47,6 +51,15 @@ export class OrbitScene {
       this.path = this.tracePath(this.mote, 14, 3);
       this.peri = this.perihelion(this.path);
       this.guess = null; this.phase = 'predict';
+    } else if (this.type === 'climb') {
+      // Already in a clean circular orbit, coasting. Player commits a prediction, THEN we fire a
+      // prograde (forward) burn. Prograde thrust raises the OPPOSITE side: the craft climbs to a
+      // higher orbit but arrives moving SLOWER than it started — the speed-up-to-go-up paradox.
+      this.mote = { x: this.start.x, y: this.start.y, vx: this.vCirc, vy: 0 };  // circular, moving +x
+      this.guess = null; this.phase = 'predict'; this.burned = false;
+      this.startSpeed = this.vCirc; this.apoSpeed = null; this.peakR = this.r0; this.prevR = this.r0;
+      this.trail = []; this.runT = 0; this.lastAng = null; this.sweep = 0;
+      this.buildClimbChips(game);
     } else {
       this.mote = { x: this.start.x, y: this.start.y, vx: 0, vy: 0 };
       this.aiming = false; this.aim = null; this.preview = null; this.phase = 'aim';
@@ -77,6 +90,25 @@ export class OrbitScene {
   }
   perihelion(path) { let best = path[0], bd = Infinity; for (const p of path) { const d = Math.hypot(p.x - this.planet.x, p.y - this.planet.y); if (d < bd) { bd = d; best = p; } } return best; }
 
+  // two prediction chips for the climb refusal: faster vs slower at the higher orbit
+  buildClimbChips(game) {
+    const W = game.W, cy = game.H * 0.88, h = 42, w = Math.min(150, (W - 40) / 2 - 8);
+    const total = w * 2 + 14; let x = (W - total) / 2;
+    this.chips = [['faster', 'Faster up there'], ['slower', 'Slower up there']].map(([id, label]) => { const c = { id, label, x, y: cy - h / 2, w, h }; x += w + 14; return c; });
+  }
+  drawClimbChip(ctx, c) {
+    ctx.save(); const r = 13;
+    ctx.beginPath();
+    ctx.moveTo(c.x + r, c.y); ctx.arcTo(c.x + c.w, c.y, c.x + c.w, c.y + c.h, r);
+    ctx.arcTo(c.x + c.w, c.y + c.h, c.x, c.y + c.h, r); ctx.arcTo(c.x, c.y + c.h, c.x, c.y, r);
+    ctx.arcTo(c.x, c.y, c.x + c.w, c.y, r); ctx.closePath();
+    ctx.fillStyle = 'rgba(174,240,255,.12)'; ctx.fill();
+    ctx.lineWidth = 1.5; ctx.strokeStyle = 'rgba(174,240,255,.5)'; ctx.stroke();
+    ctx.fillStyle = '#e8f8ff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.font = '600 14px "Outfit", system-ui, sans-serif';
+    ctx.fillText(c.label, c.x + c.w / 2, c.y + c.h / 2); ctx.restore();
+  }
+
   clearChallenge(game) {
     const last = this.ci >= this.challenges.length - 1;
     game.noteProgress('orbit', this.ci + 1);
@@ -89,6 +121,25 @@ export class OrbitScene {
     if (this.type === 'kepler') {
       if (this.phase === 'predict') { this.guess = { x, y }; game.sfx.pickup(); this.launch(game); }
       else if (this.phase === 'reveal') this.clearChallenge(game);
+      return;
+    }
+    if (this.type === 'climb') {
+      if (this.phase === 'predict') {
+        for (const c of this.chips) if (x >= c.x && x <= c.x + c.w && y >= c.y && y <= c.y + c.h) {
+          this.guess = c.id; game.sfx.pickup();
+          // fire the prograde (forward) burn: add speed along the current motion
+          const sp = Math.hypot(this.mote.vx, this.mote.vy) || 1;
+          // +17% prograde: lifts apoapsis to ~2.2× the start radius (stays on-screen, well below
+          // the 3× escape ring) and the apoapsis speed lands near ~0.5× the start speed — a clear,
+          // honest "climbed higher, arrived slower" without ever escaping.
+          const boost = this.vCirc * 0.17;
+          this.mote.vx += this.mote.vx / sp * boost; this.mote.vy += this.mote.vy / sp * boost;
+          this.burned = true; this.launch(game);
+          game.coachOnce('orbit_climb', { kind: 'hint', title: 'Burn lit',
+            sub: 'You just thrust forward. Watch the speed readout as it coasts up to the new high point.' });
+          return;
+        }
+      } else if (this.phase === 'reveal') { this.clearChallenge(game); }
       return;
     }
     if (this.phase === 'aim') {
@@ -119,7 +170,10 @@ export class OrbitScene {
 
   // ---------- update ----------
   update(dt, game) {
-    if (this.phase !== 'run') return;
+    // the climb challenge keeps orbiting LIVE even while the player is committing a prediction,
+    // so the steady circular speed is felt before the burn changes it.
+    const climbing = this.type === 'climb' && (this.phase === 'predict' || this.phase === 'run');
+    if (this.phase !== 'run' && !climbing) return;
     const steps = Math.max(1, Math.round(dt / DT));
     for (let i = 0; i < steps; i++) {
       stepEulerCromer(this.mote, b => this.grav(b), DT);
@@ -132,7 +186,8 @@ export class OrbitScene {
       this.maxR = Math.max(this.maxR, r);
       if (r > this.r0 * 1.15) this.wentOut = true;
       if (r < this.crashR) return this.crash(game);
-      if (r > this.escR) return this.escaped(game);
+      // the climb burn is sub-escape by design; don't treat its high apoapsis as an "escape"
+      if (r > this.escR && this.type !== 'climb') return this.escaped(game);
     }
     // trail breadcrumbs
     if (this.trail.length === 0 || this.runT - this.trail[this.trail.length - 1].t > 0.05) {
@@ -149,6 +204,17 @@ export class OrbitScene {
       // bound orbit that came back without escaping → fail
       if (this.wentOut && this.rOf(this.mote) < this.r0 * 0.9 && this.runT > 0.5) return this.cameBack(game);
       if (this.runT > 16) return this.cameBack(game);
+    } else if (this.type === 'climb' && this.burned) {
+      // detect apoapsis: the high point of the new orbit, where it is moving SLOWEST. The craft
+      // rose after the burn; the instant r starts shrinking again is the top of the climb.
+      const r = this.rOf(this.mote);
+      this.peakR = Math.max(this.peakR, r);
+      const rising = r >= this.prevR;
+      if (!rising && this.peakR > this.r0 * 1.1 && this.runT > 0.4) {
+        this.apoSpeed = Math.hypot(this.mote.vx, this.mote.vy);
+        return this.climbDone(game);
+      }
+      this.prevR = r;
     }
   }
 
@@ -192,8 +258,29 @@ export class OrbitScene {
     this.phase = 'reveal';
     const gd = this.guess ? Math.hypot(this.guess.x - this.peri.x, this.guess.y - this.peri.y) : 999;
     import('../ui/hud.js').then(UI => {
-      if (gd < 60) { game.award(12); game.state.predictedRight.orbit = true; UI.toast(game, { kind: 'win', title: 'You called it — fastest at its closest', sub: 'A moon or planet races at its nearest point and dawdles when far. Equal areas in equal times (Kepler).' }); }
+      if (gd < 60) { game.awardReason(); game.state.predictedRight.orbit = true; UI.toast(game, { kind: 'win', title: 'You called it — fastest at its closest', sub: 'A moon or planet races at its nearest point and dawdles when far. Equal areas in equal times (Kepler).' }); }
       else UI.toast(game, { kind: 'fail', title: 'Fastest when CLOSEST', sub: 'It moves quickest at the point nearest the world, and slowest when far out — gravity is strongest up close. (Kepler’s 2nd law.)' });
+    });
+  }
+
+  // The flagship cross-stage refusal. A forward burn DID raise the orbit — but at the new high
+  // point the craft is moving SLOWER than before, not faster. Honest framing per curriculum §5:
+  // the burn added a brief speed boost, but that energy went into HEIGHT; up high, with the same
+  // bound orbit, the speed is lower than the circle it left. (Climbed higher → arrived slower.)
+  climbDone(game) {
+    this.phase = 'reveal'; game.sfx.win();
+    const climbed = this.peakR > this.r0 * 1.05;
+    const slower = this.apoSpeed != null && this.apoSpeed < this.startSpeed;
+    import('../ui/hud.js').then(UI => {
+      if (this.guess === 'slower') {
+        game.awardReason(); game.state.predictedRight.orbit = true;
+        UI.toast(game, { kind: 'win', title: 'You called it — slower up high',
+          sub: 'Counter-intuitive but true: the forward burn lifted it to a higher orbit, and up there it moves SLOWER, not faster. The extra push turned into HEIGHT, not lasting speed — climb traded speed for altitude.' });
+      } else {
+        UI.toast(game, { kind: 'fail', title: 'You sped up — then you slowed and dropped back',
+          sub: 'The burn gave a quick boost, but it climbed to a higher orbit and arrived SLOWER than it started — then falls back. To go up you slow down; the push became HEIGHT, not speed. (That’s the orbit paradox.)' });
+      }
+      UI.flash(climbed && slower ? 'Thrust to climb → you end up higher AND slower. Speed became height.' : 'Watch: it climbed, then slowed at the top.');
     });
   }
 
@@ -221,9 +308,24 @@ export class OrbitScene {
 
     // guess marker (kepler)
     if (this.type === 'kepler' && this.guess) drawRing(ctx, this.guess.x, this.guess.y, 16, ESCC, { time: t, dash: true });
-    // reveal the true fastest point
-    if (this.phase === 'reveal') { drawRing(ctx, this.peri.x, this.peri.y, 18, '#fff', { time: t, lit: true });
+    // reveal the true fastest point (kepler only)
+    if (this.type === 'kepler' && this.phase === 'reveal') { drawRing(ctx, this.peri.x, this.peri.y, 18, '#fff', { time: t, lit: true });
       label(ctx, this.peri.x, this.peri.y - 28, 'fastest here', { color: '#fff', size: 12 }); }
+
+    // climb refusal: starting-circle reference + live speed vs the original circular speed
+    if (this.type === 'climb') {
+      drawRing(ctx, this.planet.x, this.planet.y, this.r0, hexA(COL, 0.18), { time: t });   // the orbit it left
+      const sp = Math.hypot(this.mote.vx, this.mote.vy);
+      const ratio = sp / this.startSpeed;
+      const col = ratio < 0.99 ? ESCC : COL;                  // gold once it has actually SLOWED
+      label(ctx, this.mote.x, this.mote.y - 26, `${ratio.toFixed(2)}× start speed`, { color: col, size: 12 });
+      if (this.phase === 'predict') {
+        label(ctx, game.W / 2, this.chips[0].y - 24, 'It’s circling steadily. Thrust forward to climb — faster or slower up there?', { color: '#fff', size: 13.5 });
+        for (const c of this.chips) this.drawClimbChip(ctx, c);
+      } else if (this.phase === 'run' && this.burned) {
+        label(ctx, game.W / 2, game.H * 0.9, 'climbing — watch the speed…', { color: hexA(COL, 0.8), size: 12.5 });
+      }
+    }
 
     // the mote
     if (this.phase !== 'done' || this.type === 'escape') drawMote(ctx, this.mote.x, this.mote.y, 11, COL, { time: t, pulse: this.phase === 'aim' ? 1 : 0 });

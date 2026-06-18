@@ -202,7 +202,7 @@ export class SystemScene {
   keplerReveal(game) {
     const correct = this.guess === 'inner';
     import('../ui/hud.js').then(UI => {
-      if (correct) { game.award(12); game.state.predictedRight.system = true; UI.toast(game, { kind: 'win', title: 'You called it — the inner world', sub: 'Closer in means faster AND a smaller loop — so it laps the star first. Farther out = slower and a much longer year. (Kepler’s 3rd law.)' }); }
+      if (correct) { game.awardReason(); game.state.predictedRight.system = true; UI.toast(game, { kind: 'win', title: 'You called it — the inner world', sub: 'Closer in means faster AND a smaller loop — so it laps the star first. Farther out = slower and a much longer year. (Kepler’s 3rd law.)' }); }
       else UI.toast(game, { kind: 'fail', title: 'The INNER world finishes first', sub: 'It’s both faster and has less distance to cover. Farther planets are slower and have far longer years — T² grows with r³.' });
     });
   }

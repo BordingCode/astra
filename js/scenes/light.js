@@ -191,7 +191,7 @@ export class LightScene {
   prismReveal(game) {
     const correct = this.guess === 'violet';
     import('../ui/hud.js').then(UI => {
-      if (correct) { game.award(12); game.state.predictedRight.light = true; UI.toast(game, { kind: 'win', title: 'You called it — violet', sub: 'White light is every colour at once. The prism bends violet hardest and red least — so they fan apart into a rainbow.' }); }
+      if (correct) { game.awardReason(); game.state.predictedRight.light = true; UI.toast(game, { kind: 'win', title: 'You called it — violet', sub: 'White light is every colour at once. The prism bends violet hardest and red least — so they fan apart into a rainbow.' }); }
       else UI.toast(game, { kind: 'fail', title: 'Violet bends the most', sub: 'Each colour bends a little differently — violet most, red least. That spread is what fans white light into a rainbow.' });
       UI.flash('White light was every colour all along — now you can see them.');
     });

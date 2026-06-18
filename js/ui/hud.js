@@ -1,6 +1,6 @@
 // hud.js — all DOM UI for ASTRA: tabs, objectives, toasts, flash, how-it-works,
 // the stage-clear lesson reveal, field notes, intro, menu.
-import { STAGES, HOWTO, LESSON, TRUTH, QUIZ, FINALE_CHAIN } from '../data/stages.js';
+import { STAGES, HOWTO, LESSON, TRUTH, QUIZ, FINALE_CHAIN, REASONED } from '../data/stages.js';
 
 const $ = (id) => document.getElementById(id);
 let G = null;
@@ -151,8 +151,12 @@ export function openHowto(name, force) {
 // ---------------- stage clear: the lesson + a true fact ----------------
 export function showClear(game, stageId, onNext) {
   // credit the player's reasoning, not just the sensation, when they nailed the key prediction
-  $('clearTitle').textContent = game.state.predictedRight[stageId] ? 'You called it.' : 'You felt it.';
+  const reasoned = !!game.state.predictedRight[stageId];
+  $('clearTitle').textContent = reasoned ? 'You called it.' : 'You felt it.';
+  // when they reasoned it, restate the PRINCIPLE back as their own thinking (not just praise)
+  const reflect = reasoned && REASONED[stageId] ? `<p class="clear-reason">${REASONED[stageId]}</p>` : '';
   $('clearBody').innerHTML =
+    reflect +
     `<p class="clear-lesson">${LESSON[stageId] || ''}</p>` +
     (TRUTH[stageId] ? `<div class="clear-truth"><b>True story:</b> ${TRUTH[stageId]}</div>` : '');
   const ov = $('clear'); ov.classList.remove('hidden');
