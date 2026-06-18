@@ -113,7 +113,7 @@ export function toast(game, { kind = 'info', title, sub, fact, glyph }) {
   card.innerHTML = `<div class="t-glyph">${glyph || TGLYPH[kind] || '◈'}</div><div class="t-body">
     <div class="t-title">${title}</div>${sub ? `<div class="t-sub">${sub}</div>` : ''}
     ${fact ? `<div class="t-fact">${fact}</div>` : ''}${coaching ? `<div class="t-dismiss">tap to dismiss</div>` : ''}</div>`;
-  wrap.appendChild(card);
+  wrap.insertBefore(card, wrap.firstChild);   // toast on top; a flash banner (if any) sits below it
   requestAnimationFrame(() => card.classList.add('show'));
   const kill = () => { card.classList.remove('show'); setTimeout(() => card.remove(), 400); };
   card.addEventListener('click', kill);
@@ -125,13 +125,19 @@ export function toast(game, { kind = 'info', title, sub, fact, glyph }) {
 }
 
 // ---------------- flash banner ----------------
+// Lives inside the #toasts column so it STACKS below any toast (never overlaps it), and is
+// detached from the DOM while hidden so it leaves no gap.
 export function flash(msg) {
+  const wrap = $('toasts');
   let f = $('flash');
-  if (!f) { f = document.createElement('div'); f.id = 'flash'; $('stage').appendChild(f); }
-  f.textContent = msg; f.classList.add('show');
+  if (!f) { f = document.createElement('div'); f.id = 'flash'; }
+  f.textContent = msg;
+  if (f.parentElement !== wrap) wrap.appendChild(f);     // always last → below the toast
+  requestAnimationFrame(() => f.classList.add('show'));
   const words = String(msg).trim().split(/\s+/).length;
   const dwell = Math.min(13000, Math.max(3000, 1600 + words * 480));
-  clearTimeout(f._t); f._t = setTimeout(() => f.classList.remove('show'), dwell);
+  clearTimeout(f._t);
+  f._t = setTimeout(() => { f.classList.remove('show'); setTimeout(() => { if (f.parentElement) f.remove(); }, 380); }, dwell);
 }
 
 // ---------------- how-it-works ----------------
