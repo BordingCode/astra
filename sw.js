@@ -62,3 +62,5 @@ self.addEventListener('fetch', (e) => {
     })
   );
 });
+
+// hub-stats tracker v1
