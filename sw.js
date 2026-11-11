@@ -1,6 +1,6 @@
 // sw.js — ASTRA service worker. Network-first for navigations & JS (fresh deploys),
 // stale-while-revalidate for other assets. Bump CACHE when the asset list changes.
-const CACHE = 'astra-v14';
+const CACHE = 'astra-v15';
 const ASSETS = [
   './',
   './index.html',
